@@ -5,17 +5,27 @@ import { StudentGreeting } from "@/components/StudentGreeting";
 import { ThisWeekList } from "@/components/ThisWeekList";
 import { PaperProgressRow } from "@/components/PaperProgressRow";
 import { ManagePapers } from "@/components/ManagePapers";
-import { getStudent, getStudentPapers } from "@/lib/selectors";
+import { getStudent, getStudentPapers, getStudentProgress } from "@/lib/selectors";
 
 export function StudentOverview({ studentId, adminMode = false }: { studentId: string; adminMode?: boolean }) {
   const { state } = useTracker();
   const student = getStudent(state, studentId);
   if (!student) return <p className="py-12">Student not found.</p>;
   const papers = getStudentPapers(state, studentId);
+  const progress = getStudentProgress(state, studentId);
+  const total = state.topics.filter(topic => student.paperIds.includes(topic.paperId)).length;
+  const comfortable = progress.filter(item => item.status === "Okay").length;
+  const learning = progress.filter(item => item.status === "Learning").length;
+  const needs = progress.filter(item => item.status === "Needs Practice").length;
 
   return (
     <>
       <StudentGreeting name={student.fullName} examDiet={student.examDiet} level={student.level} />
+      <section className="pulse-grid" aria-label="Your preparation at a glance">
+        <div className="pulse-card pulse-green"><span className="pulse-label">Feeling confident</span><strong>{comfortable}<small> / {total}</small></strong><span>topics marked okay</span></div>
+        <div className="pulse-card pulse-blue"><span className="pulse-label">In the making</span><strong>{learning}</strong><span>topics you’re learning</span></div>
+        <div className="pulse-card pulse-peach"><span className="pulse-label">Your next opportunity</span><strong>{needs}</strong><span>topics needing practice</span></div>
+      </section>
       <ThisWeekList studentId={studentId} adminStudentId={adminMode ? studentId : undefined} />
       <section className="border-t border-[#E4E8E5] py-8 sm:py-10" aria-labelledby={`papers-${studentId}`}>
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">

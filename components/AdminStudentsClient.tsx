@@ -54,11 +54,16 @@ export function AdminStudentsClient() {
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.17em] text-[#68716B]">Admin</p>
           <h1 className="editorial mt-1 text-4xl font-medium sm:text-5xl">Students</h1>
-          <p className="mt-3 text-sm text-[#68716B]">Who is this student and what currently needs attention?</p>
+          <p className="mt-3 text-sm text-[#68716B]">A little guidance today. More confident students tomorrow.</p>
         </div>
         <button onClick={() => { setOpen((value) => !value); setFormError(null); setCreated(null); }} className="focus-ring min-h-11 rounded-md bg-[#365B46] px-4 text-sm font-semibold text-white">+ Add Student</button>
       </div>
 
+      <section className="pulse-grid" aria-label="Student overview">
+        <div className="pulse-card pulse-green"><span className="pulse-label">Your learning community</span><strong>{students.length}</strong><span>students with portal profiles</span></div>
+        <div className="pulse-card pulse-blue"><span className="pulse-label">Room to grow</span><strong>{state.papers.length}</strong><span>papers in your catalogue</span></div>
+        <div className="pulse-card pulse-peach"><span className="pulse-label">A helpful nudge</span><strong>{students.filter(student => getStudentProgress(state, student.id).some(item => item.status === "Needs Practice")).length}</strong><span>students with practice topics</span></div>
+      </section>
       {created && <p className="mt-5 rounded-md border border-[#D7E2DA] bg-[#F4F8F4] px-4 py-3 text-sm text-[#365B46]" role="status">{created}</p>}
       {syncError && !open && <p className="mt-5 rounded-md border border-[#E7D6D0] bg-[#FCF6F4] px-4 py-3 text-sm text-[#7F4A3D]" role="alert">{syncError}</p>}
 
@@ -94,6 +99,7 @@ export function AdminStudentsClient() {
         </form>
       )}
 
+      {students.length === 0 && <div className="community-empty"><span className="empty-symbol" aria-hidden="true">＋</span><h2 className="editorial text-3xl">Big journeys start with one student.</h2><p>Add a student above to get started. Their tracker appears here after their first sign-in.</p></div>}
       <div className="py-7">
         <div className="tracker-table hidden overflow-hidden rounded-lg border border-[#DDE3DF] bg-white md:block">
           <table className="w-full text-left text-sm">
