@@ -1,3 +1,4 @@
+import { HomepagePreview } from "@/components/HomepagePreview";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { BrandLogo } from "@/components/BrandLogo";
@@ -7,6 +8,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 const errors: Record<string,string> = {"invalid-link":"That link is not valid. Request a new one below.","expired-link":"That link has expired. Request a new one below.","not-registered":"Your email has not been added yet. Ask your DIET coordinator to approve your access.","not-authorized":"Use the email registered for your DIET Tracker."};
 export default async function LoginPage({searchParams}: {searchParams: Promise<{error?: string; mode?: string}>}) {
  const {error,mode} = await searchParams; const registration = mode === "setup"; const recovery = mode === "recovery";
+ if(mode === "preview") return <HomepagePreview/>;
  if(!recovery && isSupabaseConfigured()) { const profile = await getCurrentProfile(); if(profile) redirect(profile.role === "admin" ? "/admin" : "/dashboard"); }
  return <main className="enrol-page"><header className="enrol-header"><Link href="/login" className="enrol-logo"><BrandLogo variant="wordmark" priority /></Link><span>{registration ? "Already a student?" : "New to DIET?"} <Link href={registration ? "/login" : "/login?mode=setup"}>{registration ? "Sign in" : "Get started"} →</Link></span></header>
  <div className="enrol-layout"><aside className="enrol-story"><span className="enrol-tag">YOUR ICAN JOURNEY, WITH DIRECTION</span><h2>A little focus.<br/>A lot of possibility.</h2><p>Your papers, your weekly priorities, and every step forward. All in one place.</p><div className="image-slot enrol-image" aria-label="Reserved space for the main student image"><span>STUDENT IMAGE</span><small>Portrait or illustration · 4:3</small></div><div className="enrol-story-bottom"><span>PLAN WITH PURPOSE</span><span>PRACTISE WITH CONFIDENCE</span></div></aside>
