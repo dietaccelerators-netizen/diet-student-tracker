@@ -13,7 +13,7 @@ export function ThisWeekList({ studentId, adminStudentId }: { studentId: string;
   const choices = studentPapers.flatMap((paper) => getPaperTopics(state, paper.id).map((topic) => ({ paper, topic, progress: getProgressForTopic(state, studentId, topic.id) }))).filter((item) => item.progress && !item.progress.thisWeek).slice(0, 10);
 
   return (
-    <section className="py-8 sm:py-10" aria-labelledby={`this-week-${studentId}`}>
+    <section id="weekly-focus" className="weekly-panel py-8 sm:py-10" aria-labelledby={`this-week-${studentId}`}>
       <div className="mb-5 flex items-end justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.17em] text-[#68716B]">Focus</p>

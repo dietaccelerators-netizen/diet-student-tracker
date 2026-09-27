@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export function LoginForm() {
+export function LoginForm({ registration = false }: { registration?: boolean }) {
   const router = useRouter();
   const configured = Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
@@ -52,7 +52,7 @@ export function LoginForm() {
   if (sent && configured) {
     return (
       <div className="mt-8 rounded-lg border border-[#D7E2DA] bg-[#F4F8F4] p-5" role="status">
-        <p className="font-semibold text-[#365B46]">Check your email</p>
+        <p className="font-semibold text-[#365B46]">Check your email</p><ol className="email-next-steps"><li>Open the latest DIET access email.</li><li>Follow the secure link on this device.</li><li>Review your profile and choose your papers.</li></ol>
         <p className="mt-2 text-sm leading-6 text-[#5F6A63]">We sent a secure access link to <span className="font-medium text-[#303832]">{email}</span>. Open it on this device to enter your tracker.</p>
         <button type="button" onClick={() => setSent(false)} className="focus-ring mt-4 text-sm font-semibold text-[#365B46]">Use another email</button>
       </div>
@@ -74,7 +74,7 @@ export function LoginForm() {
       />
       {error && <p className="mt-3 text-sm text-[#8C4E3E]" role="alert">{error}</p>}
       <button type="submit" disabled={submitting} className="focus-ring mt-4 min-h-12 w-full rounded-md bg-[#365B46] px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60">
-        {submitting ? "Sending…" : "Send My Access Link"}
+        {submitting ? "Sending…" : registration ? "Send my activation link →" : "Send My Access Link"}
       </button>
       <p className="mt-3 text-xs leading-5 text-[#7A837D]">We&apos;ll email you a secure link to open your tracker. No password is required.</p>
       {!configured && process.env.NODE_ENV !== "production" && <p className="mt-3 text-xs leading-5 text-[#8A735A]">Prototype mode: use <strong>tolulope@demo.diet.local</strong> or <strong>admin@demo.diet.local</strong>.</p>}

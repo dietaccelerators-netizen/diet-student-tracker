@@ -1,29 +1,15 @@
+"use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { BrandLogo } from "@/components/BrandLogo";
-
 export function BrandHeader({ mode = "student" }: { mode?: "student" | "admin" | "plain" }) {
-  const home = mode === "admin" ? "/admin" : mode === "student" ? "/dashboard" : "/login";
-
-  return (
-    <header className="brand-header sticky top-0 z-30 border-b border-[#E4E8E5] bg-[#FAFBFB]/95 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 sm:px-8">
-        <Link href={home} className="focus-ring flex items-center gap-3 rounded-md" aria-label="DIET Accelerator home">
-          <span className="h-10 w-10 shrink-0 overflow-hidden rounded-[11px] sm:h-11 sm:w-11">
-            <BrandLogo variant="icon" priority />
-          </span>
-          <span className="leading-tight">
-            <span className="block text-[11px] font-bold tracking-[0.15em] text-[#365B46] sm:text-xs">DIET ACCELERATOR</span>
-            <span className="mt-0.5 block text-[10px] font-medium tracking-[0.08em] text-[#7A837D]">STUDENT TRACKER</span>
-          </span>
-        </Link>
-
-        {mode !== "plain" && (
-          <nav aria-label="Account" className="flex items-center gap-2 text-sm text-[#68716B] sm:gap-4">
-            <span className="hidden sm:inline">{mode === "admin" ? "Admin" : "Student Portal"}</span>
-            <form action="/auth/signout" method="post"><button type="submit" className="focus-ring rounded-md px-2 py-2 hover:text-[#20262B]">Sign out</button></form>
-          </nav>
-        )}
-      </div>
+  const path = usePathname();
+  const home = mode === "admin" ? "/admin" : "/dashboard";
+  return <>
+    <header className="brand-header app-topbar">
+      <Link href={mode === "plain" ? "/login" : home} className="app-brand focus-ring"><span className="brand-symbol"><BrandLogo priority /></span><span><strong>DIET ACCELERATOR</strong><small>Make preparation count.</small></span></Link>
+      <div className="topbar-account"><span className="account-badge">{mode === "admin" ? "Admin workspace" : "Student workspace"}</span>{mode !== "plain" && <form action="/auth/signout" method="post"><button className="focus-ring signout-button">Sign out</button></form>}</div>
     </header>
-  );
+    {mode !== "plain" && <aside className="app-sidebar"><p className="nav-caption">MY WORKSPACE</p><nav aria-label="Main navigation"><Link className={path === home ? "nav-item active" : "nav-item"} href={home}><span aria-hidden="true">⌂</span>{mode === "admin" ? "Students" : "Overview"}</Link>{mode === "student" && <><Link className="nav-item" href="/dashboard#my-papers"><span aria-hidden="true">▤</span>My papers</Link><Link className="nav-item" href="/dashboard#weekly-focus"><span aria-hidden="true">◎</span>Weekly focus</Link><Link className="nav-item" href="/dashboard#my-progress"><span aria-hidden="true">↗</span>My progress</Link></>}</nav><div className="sidebar-note"><span className="sidebar-note-tag">A LITTLE EVERY DAY</span><h2>Progress has a pace.<br/>Find yours.</h2><p>Show up for one topic today. Your next step matters.</p><div className="image-slot sidebar-image" aria-label="Reserved space for a study image"><span>STUDY IMAGE</span></div></div><p className="sidebar-footer">Your preparation, in one place.</p></aside>}
+  </>;
 }

@@ -13,16 +13,17 @@ export function PaperProgressRow({ state, studentId, paper, adminStudentId }: { 
   const href = adminStudentId ? `/admin/students/${adminStudentId}?paper=${paper.id}` : `/papers/${paper.id}`;
 
   return (
-    <Link href={href} className="paper-row-enhanced focus-ring group grid min-h-20 grid-cols-[1fr_auto] items-center gap-4 border-b border-[#E7EBE8] py-5 last:border-b-0">
-      <div className="min-w-0">
+    <Link href={href} className="paper-row-enhanced course-card focus-ring group">
+      <div className="image-slot course-image" aria-label={`Reserved cover image for ${paper.code}`}><span>{paper.code}</span><small>PAPER COVER</small></div>
+      <div className="course-card-body min-w-0">
         <div className="flex items-baseline gap-3">
           <span className="text-sm font-bold tracking-[0.08em] text-[#365B46]">{paper.code}</span>
-          <span className="hidden truncate text-sm text-[#68716B] sm:inline">{paper.name}</span>
+          <span className="course-name">{paper.name}</span>
         </div>
         <div className="paper-meter" role="progressbar" aria-label={`${paper.code} topics marked okay`} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100}><span style={{ width: `${percent}%` }} /></div>
         <p className="mt-2 text-xs leading-5 text-[#68716B]">{summary || "No updates yet"}</p>
       </div>
-      <span aria-hidden="true" className="text-lg text-[#96A099] transition-transform group-hover:translate-x-0.5">→</span>
+      <div className="course-card-footer"><span>Open paper</span><span aria-hidden="true">→</span></div>
     </Link>
   );
 }
