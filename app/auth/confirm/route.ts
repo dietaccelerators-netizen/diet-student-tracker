@@ -39,5 +39,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/login?error=not-registered", request.url));
   }
 
-  return NextResponse.redirect(new URL(profile.role === "admin" ? "/admin" : "/dashboard", request.url));
+  return NextResponse.redirect(new URL(type === "recovery" ? "/login?mode=recovery" : profile.role === "admin" ? "/admin" : "/dashboard", request.url));
 }
