@@ -19,7 +19,7 @@ export function StudentHomepage({state,studentId,preview=false}:{state:TrackerSt
  const weekly=progress.filter(p=>p.thisWeek), confident=progress.filter(p=>p.status==='Okay').length;
  const filtered=papers.filter(p=>`${p.code} ${p.name}`.toLowerCase().includes(search.trim().toLowerCase()));
  const stage=stageFor(student.level)??student.level;
- const href=(url:string)=>preview&&!url.startsWith('#')?'/login':url;
+ const href=(url:string)=>preview&&!url.startsWith('#')?(url.startsWith('/papers/')?`/login?mode=preview&stage=${encodeURIComponent(stage)}&subject=${encodeURIComponent(url.slice(8))}`:'/login'):url;
  const feature=features[slide];
  return <div className="learning-home">
   <header className="home-welcome"><div><p>YOUR LEARNING HOME</p><h1>Hello, {student.fullName.split(' ')[0]}<span className="welcome-dot">.</span></h1><span>What would you like to work on today?</span></div><Link href={href('/dashboard?view=profile')} className="home-stage"><span>{stage.startsWith('ATS')?'ATSWA':'ICAN'}</span><strong>{stage}</strong><span aria-hidden="true">⌄</span></Link></header>
