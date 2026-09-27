@@ -1,5 +1,6 @@
 "use client";
 
+import { StudentHomepage } from "@/components/StudentHomepage";
 import { useState } from "react";
 import { StudentSetup } from "@/components/StudentSetup";
 import { useTracker } from "@/components/TrackerProvider";
@@ -23,6 +24,8 @@ export function StudentOverview({ studentId, adminMode = false }: { studentId: s
   const needs = progress.filter(item => item.status === "Needs Practice").length;
 
   if (!adminMode && (setupOpen || (!student.paperIds.length && !setupFinished))) return <StudentSetup studentId={studentId} onDone={() => {setSetupOpen(false);setSetupFinished(true);}} />;
+
+  if (!adminMode) return <StudentHomepage state={state} studentId={studentId} />;
 
   return (
     <>
