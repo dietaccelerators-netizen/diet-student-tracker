@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { stagePapers } from "@/lib/stages";
 import { useTracker } from "@/components/TrackerProvider";
 import { getStudent } from "@/lib/selectors";
 
@@ -18,8 +19,8 @@ export function ManagePapers({ studentId, adminMode = false }: { studentId: stri
   }, [student?.paperIds, student, adminMode]);
 
   const ordered = useMemo(
-    () => [...state.papers].sort((a, b) => a.displayOrder - b.displayOrder),
-    [state.papers],
+    () => stagePapers(state.papers, student?.level ?? "").sort((a, b) => a.displayOrder - b.displayOrder),
+    [state.papers, student?.level],
   );
 
   if (!student) return null;

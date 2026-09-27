@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { resourcesFor } from "@/lib/stages";
 import { useTracker } from "@/components/TrackerProvider";
 import { getPaperTopics, getProgressForTopic, getStudent } from "@/lib/selectors";
 import type { QuestionPractice, TopicStatus } from "@/lib/types";
@@ -22,6 +23,7 @@ export function PaperDetailClient({ studentId, paperId, adminStudentId }: { stud
     return <div className="py-12"><p className="font-semibold">This paper is not active in this tracker.</p><p className="mt-2 text-sm text-[#68716B]">Add it again from Manage Papers to restore its previous progress.</p><Link href={backHref} className="mt-5 inline-block font-semibold text-[#365B46]">← Back to tracker</Link></div>;
   }
   const topics = getPaperTopics(state, paperId);
+  if (!topics.length) return <section className="empty-panel"><Link href={backHref}>← Back to my subjects</Link><h1 className="editorial mt-6 text-3xl">{paper.name}</h1><p className="mt-4">Your subject is ready. The DIET team will add its topic plan and lesson materials here.</p><a className="primary-button inline-block" href={resourcesFor(student.level)} target="_blank" rel="noreferrer">Open official ICAN resources ↗</a></section>;
 
   return (
     <>

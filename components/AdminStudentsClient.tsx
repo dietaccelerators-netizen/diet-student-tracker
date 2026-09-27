@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useMemo, useState } from "react";
+import { STAGES, stagePapers } from "@/lib/stages";
 import { useTracker } from "@/components/TrackerProvider";
 import { getStudentProgress } from "@/lib/selectors";
 import type { NewStudentInput } from "@/lib/types";
@@ -12,7 +13,7 @@ export function AdminStudentsClient() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [diet, setDiet] = useState("November 2026");
-  const [level, setLevel] = useState("Professional Level");
+  const [level, setLevel] = useState("Professional");
   const [paperIds, setPaperIds] = useState<string[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
   const [created, setCreated] = useState<string | null>(null);
@@ -73,14 +74,14 @@ export function AdminStudentsClient() {
             <label className="text-sm font-medium">Full Name<input required value={name} onChange={(e) => setName(e.target.value)} className="focus-ring mt-2 min-h-11 w-full rounded-md border border-[#D5DBD7] px-3 font-normal" /></label>
             <label className="text-sm font-medium">Email<input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="focus-ring mt-2 min-h-11 w-full rounded-md border border-[#D5DBD7] px-3 font-normal" /></label>
             <label className="text-sm font-medium">Exam Diet<input required value={diet} onChange={(e) => setDiet(e.target.value)} className="focus-ring mt-2 min-h-11 w-full rounded-md border border-[#D5DBD7] px-3 font-normal" /></label>
-            <label className="text-sm font-medium">Level<input required value={level} onChange={(e) => setLevel(e.target.value)} className="focus-ring mt-2 min-h-11 w-full rounded-md border border-[#D5DBD7] px-3 font-normal" /></label>
+            <label className="text-sm font-medium">Exam stage<select required value={level} onChange={(e) => {setLevel(e.target.value);setPaperIds([]);}} className="focus-ring mt-2 min-h-11 w-full rounded-md border border-[#D5DBD7] px-3 font-normal">{STAGES.map(stage => <option key={stage}>{stage}</option>)}</select></label>
           </div>
 
           <fieldset className="mt-5">
             <legend className="text-sm font-semibold">Starting papers <span className="font-normal text-[#7A837D]">(optional)</span></legend>
             <p className="mt-1 text-xs leading-5 text-[#7A837D]">You can assign papers now, or leave this blank and let the student choose their papers when they first open the tracker.</p>
             <div className="mt-3 flex flex-wrap gap-3">
-              {state.papers.map((paper) => (
+              {stagePapers(state.papers,level).map((paper) => (
                 <label key={paper.id} className="flex min-h-11 items-center gap-2 rounded-md border border-[#DDE3DF] px-3 text-sm">
                   <input type="checkbox" checked={paperIds.includes(paper.id)} onChange={(e) => setPaperIds((current) => e.target.checked ? [...new Set([...current, paper.id])] : current.filter((id) => id !== paper.id))} className="h-4 w-4 accent-[#365B46]" />
                   {paper.code}
