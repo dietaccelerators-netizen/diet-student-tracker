@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { EB_Garamond, Inter } from "next/font/google";
+import { EB_Garamond, Inter, Manrope, Outfit } from "next/font/google";
 import "./globals.css";
 import { TrackerProvider } from "@/components/TrackerProvider";
 import { initialTrackerState } from "@/lib/mock-data";
@@ -7,6 +7,9 @@ import { loadTrackerState, emptyTrackerState } from "@/lib/data/supabase-state";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 
+const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
+// Temporary display fallback until the licensed Tanod webfont is supplied.
+const display = Outfit({ subsets: ["latin"], variable: "--font-display" });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const garamond = EB_Garamond({ subsets: ["latin"], variable: "--font-garamond" });
 
@@ -50,7 +53,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${garamond.variable}`}>
+      <body className={`${inter.variable} ${garamond.variable} ${manrope.variable} ${display.variable}`}>
         <TrackerProvider initialState={initialState} currentUserId={currentUserId} backend={backend}>
           {children}
         </TrackerProvider>
