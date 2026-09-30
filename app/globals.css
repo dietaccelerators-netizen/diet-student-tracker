@@ -636,7 +636,7 @@ main:has(.da-home) .da-sidebar-logo small { display:block; font-size:11px; text-
 main:has(.da-home) .nav-caption,main:has(.da-home) .sidebar-note,main:has(.da-home) .sidebar-footer { display:none; }
 main:has(.da-home) .app-sidebar .nav-item { color:#183344; font-size:14px; min-height:52px; margin-bottom:8px; padding:12px 16px; border-radius:8px; gap:16px; }
 main:has(.da-home) .app-sidebar .nav-item:hover { background:#f1faf4; }
-main:has(.da-home) .app-sidebar .nav-item.active,main:has(.da-home) .app-sidebar .nav-item[href="/dashboard"] { background:#dcfbe5; color:#0f3b27; font-weight:750; }
+main:has(.da-home) .app-sidebar .nav-item.active { background:#dcfbe5; color:#0f3b27; font-weight:750; }
 main:has(.da-home) .da-sidebar-support { display:block; margin-top:auto; padding:25px 12px 0; border-top:1px solid #e5ece8; font-size:14px; }
 main:has(.da-home) .da-sidebar-support p { font-size:12px; color:#607082; line-height:1.7; margin-top:8px; }
 main:has(.da-home)> .mx-auto { margin-left:235px; padding:34px 28px 30px; max-width:none; }
@@ -661,3 +661,40 @@ main:has(.da-home) .home-preview-note { font-size:12px; padding:8px 12px; margin
 @media(max-width:760px) { main:has(.da-home) .app-sidebar { position:relative;top:0;width:100%;padding:18px 16px 8px;border-right:0;border-bottom:1px solid #e5ece8; }.da-sidebar-support { display:none!important; }main:has(.da-home) .da-sidebar-logo { width:160px;padding:0 0 18px; }main:has(.da-home) .da-sidebar-logo small { display:none; }main:has(.da-home) .app-sidebar nav { display:flex;gap:5px;overflow-x:auto; }main:has(.da-home) .app-sidebar .nav-item { min-height:44px;font-size:13px;margin:0;gap:7px;padding:10px 12px; }main:has(.da-home)> .mx-auto { margin:0;padding:20px 16px 30px; }.da-welcome { gap:17px;margin-bottom:20px; }.da-welcome h1 { font-size:30px; }.da-header-actions { width:100%; }.da-account b { display:none; }.da-action-grid { grid-template-columns:1fr; }.da-top-grid { gap:14px; }.da-subject-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }.da-subject h3 { min-height:66px; }.da-resume { padding:22px 18px;gap:8px; }.da-resume h2 { font-size:30px; }.da-hero-art { flex-basis:110px; padding:0; }.da-primary { padding:10px 12px;gap:8px;font-size:13px; }.da-week { padding:22px 18px; }.da-week ul { grid-template-columns:1fr; }.da-promo { padding:22px 18px; }.da-section-title>a { font-size:12px; }.da-subject { padding:10px 12px 0; }.da-footnote { text-align:left; }.da-home .da-description { font-size:13px; } }
 @media(max-width:380px) { .da-resume { flex-direction:column;align-items:stretch; }.da-hero-art { flex-basis:auto;align-self:center;width:120px; }.da-subject-grid { grid-template-columns:1fr; }.da-subject h3 { min-height:0; }.da-week-content { grid-template-columns:1fr; }.da-week-summary { display:none; } }
 @media(prefers-reduced-motion:reduce) { .da-subject:hover { transform:none; }.da-home * { transition:none!important; } }
+
+/* Approved Template B: subject catalogue. */
+main:has(.da-subject-page) .app-sidebar .nav-item[href="/dashboard"]:not(.active) { background:transparent;font-weight:400;color:#183344; }
+.da-subject-page .ds-count { font-size:12px;color:#687c88; }
+.ds-feature-grid { grid-template-columns:1.3fr 1fr; }
+.ds-resources { display:flex;align-items:center;gap:20px;background:#e0f7fc;border-radius:10px;padding:25px;min-width:0; }
+.ds-resources>div:first-child { flex:1;min-width:0; }
+.ds-resources p { color:#36566a;font-size:14px;line-height:1.75;margin-top:12px; }
+.ds-resource-art { flex:0 0 34%;background:#d1f1fa;border-radius:8px;padding:8px; }
+.ds-resources .da-outline { font-size:13px;gap:12px; }
+.ds-catalogue { margin-top:22px;scroll-margin-top:20px; }
+.ds-filters { display:flex;gap:16px;margin-bottom:16px; }
+.ds-filters .da-search { flex:1; }
+.ds-filters input { width:100%; }
+.ds-stage { min-width:160px;display:grid;place-items:center;padding:12px 20px;border:1px solid #dfe6eb;border-radius:8px;font-size:14px; }
+.ds-manage { margin:0 0 16px; }
+.ds-manage>div>button { font-family:var(--font-manrope),sans-serif; }
+.ds-grid { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px; }
+.ds-card { padding:18px 20px 0;border-top-width:8px; }
+.ds-card-top { display:flex;gap:16px;align-items:flex-start; }
+.ds-card .da-subject-art { width:96px;height:90px;flex:0 0 96px;margin:0; }
+.ds-card .da-subject-art .da-art { height:82px;width:86px; }
+.ds-card-heading { flex:1;min-width:0; }
+.ds-card h3 { min-height:0;font-size:16px;line-height:1.45; }
+.ds-card p { font-size:13px; }
+.ds-card .da-progress-line { margin:12px 0 0;gap:10px; }
+.ds-next { margin:17px 0 12px;font-size:13px;color:#4c6478;min-height:54px; }
+.ds-next>span { font-size:12px; }
+.ds-next p { margin-top:4px;line-height:1.7;color:#334f63; }
+.ds-card .da-subject-open { padding:13px 0;font-size:14px; }
+.ds-results { color:#4c6478;font-size:13px;margin:0 0 16px!important; }
+.ds-results button { margin-left:12px;text-decoration:underline;color:#07563a;cursor:pointer; }
+.da-subject-page button:focus-visible { outline:3px solid #137044;outline-offset:4px; }
+@media(max-width:1350px) { .ds-card-top { gap:12px; }.ds-card .da-subject-art { width:76px;height:78px;flex-basis:76px; }.ds-card .da-subject-art .da-art { width:70px;height:70px; }.ds-card { padding:15px 15px 0; }.ds-card h3 { font-size:14px; } }
+@media(max-width:1150px) { .ds-feature-grid { grid-template-columns:1fr; }.ds-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }.ds-resource-art { flex-basis:135px; }.ds-resources { min-height:210px; } }
+@media(max-width:760px) { .ds-feature-grid { gap:14px; }.ds-count { display:none!important; }.da-subject-page .da-welcome { flex-wrap:nowrap; }.da-subject-page .da-header-actions { flex:0;width:auto; }.ds-stage { min-width:0;padding:10px;font-size:12px; }.ds-filters { gap:8px; }.ds-filters .da-search { min-width:0; }.ds-resources { padding:22px 18px;gap:12px; }.ds-resource-art { flex-basis:110px; }.ds-grid { gap:12px; }.ds-card-top { flex-direction:column; }.ds-card .da-subject-art { width:100%;flex-basis:auto; }.ds-card h3 { min-height:42px; }.ds-card-heading { width:100%; }.ds-next { min-height:72px; } }
+@media(max-width:430px) { .ds-grid { grid-template-columns:1fr; }.ds-card-top { flex-direction:row; }.ds-card .da-subject-art { width:85px;flex:0 0 85px; }.ds-card h3 { min-height:0; }.ds-next { min-height:0; }.ds-resources { flex-wrap:wrap; }.ds-resource-art { flex-basis:90px; }.ds-resources .da-outline { padding:10px;font-size:12px; }.da-subject-page .da-welcome h1 { font-size:29px; } }
