@@ -18,7 +18,7 @@ export function StudentHomepage({state,studentId,preview=false}:{state:TrackerSt
  const weekly=progress.filter(p=>p.thisWeek), completed=weekly.filter(p=>p.status==='Okay').length;
  const stage=stageFor(student.level)??student.level;
  const base=`/login?mode=preview&stage=${encodeURIComponent(stage)}`;
- const href=(url:string)=>{if(!preview||url.startsWith('#'))return url;if(url.startsWith('/papers/')){const [id,query]=url.slice(8).split('?');return `${base}&subject=${encodeURIComponent(id)}${query?'&'+query:''}`;}return url==='/dashboard?view=subjects'?'#da-subjects':url==='/dashboard?view=weekly'?'#da-week':url==='/dashboard?view=practice'?`${base}&view=practice`:'/login';};
+ const href=(url:string)=>{if(!preview||url.startsWith('#'))return url;if(url.startsWith('/papers/')){const [id,query]=url.slice(8).split('?');return `${base}&subject=${encodeURIComponent(id)}${query?'&'+query:''}`;}return url==='/dashboard?view=subjects'?`${base}&view=subjects`:url==='/dashboard?view=weekly'?'#da-week':url==='/dashboard?view=practice'?`${base}&view=practice`:'/login';};
  const percentFor=(id:string)=>{const ids=new Set(state.topics.filter(t=>t.paperId===id).map(t=>t.id));return ids.size?Math.round(progress.filter(p=>ids.has(p.topicId)&&p.status==='Okay').length/ids.size*100):0;};
  const resume=recentPaper&&recentTopic?`/papers/${recentPaper.id}?lesson=${encodeURIComponent(recentTopic.id)}`:'#da-subjects';
  const filtered=papers.filter(p=>`${p.name} ${p.code}`.toLowerCase().includes(search.trim().toLowerCase()));
