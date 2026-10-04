@@ -16,7 +16,7 @@ function Windows({ value, onChange, label }: { value: Window[]; onChange: (v: Wi
     <button type="button" aria-label={`Remove ${label} window ${i+1}`} onClick={() => onChange(value.filter((_,j) => j !== i))}>Remove</button>
   </div>)}<button type="button" onClick={() => onChange([...value,{day:0,start:'18:00',end:'19:00'}])}>+ Add time window</button></fieldset>;
 }
-export function PlanSetup({ student, papers, preview = false }: { student: Profile; papers: Paper[]; preview?: boolean }) {
+export function PlanSetup({ student, papers, preview = false, onReviewed }: { student: Profile; papers: Paper[]; preview?: boolean; onReviewed?: (draft: PlanDraft) => void }) {
   const router = useRouter(), pathname = usePathname(), params = useSearchParams();
   const requested = Number(params.get('setup') || 1);
   const step = Number.isInteger(requested) && requested >= 1 && requested <= 4 ? requested - 1 : 0;
@@ -38,14 +38,14 @@ export function PlanSetup({ student, papers, preview = false }: { student: Profi
     return [...new Set(issues)];
   }
   function navigate(next: number) { if (next > step) { const problems = validate(next); setErrors(problems); if (problems.length) return; } const q = new URLSearchParams(params.toString()); q.set('setup',String(next+1)); router.push(`${pathname}?${q}`,{scroll:false}); setMessage(''); }
-  function save() { try { localStorage.setItem(storageKey,JSON.stringify(draft)); setMessage('Draft saved on this browser. You can return here to continue.'); } catch { setMessage('Draft could not be saved. Browser storage may be blocked or full.'); } }
+  function save(reviewed = false) { try { localStorage.setItem(storageKey,JSON.stringify(draft)); if (reviewed && onReviewed) onReviewed(draft); setMessage('Draft saved on this browser. You can return here to continue.'); } catch (error) { setMessage(error instanceof Error ? error.message : 'Draft could not be saved. Browser storage may be blocked or full.'); } }
   const sessions = propose(draft,papers.map(p => p.id)), available = capacity(draft), scheduled = sessions.reduce((n,s) => n+s.duration,0);
   const target = draft.approach === 'custom' ? papers.reduce((n,p) => n+(draft.allocations[p.id] || 0)*60,0) : null;
   const shortfall = target === null ? 0 : Math.max(0,target-scheduled);
   if (!loaded) return <p role="status">Loading your setup…</p>;
   return <section className={styles.setup} aria-label="Weekly plan setup">
     <header><span className={styles.eyebrow}>WEEKLY PLAN · WORKING PROTOTYPE</span><h2>Make room for your preparation.</h2><p>Set up a week that works around your life.</p></header>
-    <p className={styles.notice}>Layout and behaviour preview. Drafts stay on this browser; account saving and the live weekly timetable will be connected in the next stage.</p>
+    <p className={styles.notice}>Save a draft to continue later, or review and save your timetable to open This Week. Both stay on this browser for now.</p>
     <nav aria-label="Plan setup steps" className={styles.steps}>{STEPS.map((name,i) => <button key={name} onClick={() => navigate(i)} aria-current={step === i ? 'step' : undefined}><span>{i+1}</span>{name}</button>)}</nav>
     <div className={styles.card}><span className={styles.eyebrow}>STEP {step+1} OF 4</span><h3>{['Choose your approach','When can you study?','Make the plan work for you','Review your proposed week'][step]}</h3>
     {step === 0 && <><div className={styles.summary}><div><small>Student</small><b>{student.fullName}</b></div><div><small>Stage</small><b>{student.level}</b></div><div><small>Exam diet</small><b>{student.examDiet || 'Not set'}</b></div></div><p>Your subjects: {papers.map(p => p.name).join(', ') || 'No subjects selected'}</p>
@@ -64,7 +64,7 @@ export function PlanSetup({ student, papers, preview = false }: { student: Profi
       {!sessions.length ? <p className={styles.warning}>No sessions fit yet. Add availability, shorten your session length or allow short study blocks.</p> : <div className={styles.table}><table><thead><tr><th>Day</th><th>Time</th><th>Subject</th><th>Length</th></tr></thead><tbody>{sessions.map((s,i) => <tr key={i}><td>{DAYS[s.day]}</td><td>{s.start}–{s.end}</td><td>{papers.find(p => p.id === s.paperId)?.name}</td><td>{s.duration} min</td></tr>)}</tbody></table></div>}
       <label className={styles.check}><input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)}/>I have reviewed this proposal{shortfall > 0 ? ' and accept the lower scheduled hours' : ''}.</label></>}
     {errors.length > 0 && <div role="alert" className={styles.warning}><ul>{errors.map(e => <li key={e}>{e}</li>)}</ul></div>}
-    <footer><button disabled={step === 0} onClick={() => navigate(step-1)}>Back</button><button onClick={save}>Save draft</button>{step < 3 ? <button className={styles.primary} onClick={() => navigate(step+1)}>Continue →</button> : <button className={styles.primary} disabled={!accepted || !sessions.length} onClick={() => { const problems = validate(3); setErrors(problems); if (!problems.length) save(); }}>Save reviewed draft</button>}</footer><p role="status" aria-live="polite">{message}</p>
+    <footer><button disabled={step === 0} onClick={() => navigate(step-1)}>Back</button><button onClick={() => save()}>Save draft</button>{step < 3 ? <button className={styles.primary} onClick={() => navigate(step+1)}>Continue →</button> : <button className={styles.primary} disabled={!accepted || !sessions.length} onClick={() => { const problems = validate(3); setErrors(problems); if (!problems.length) save(true); }}>{onReviewed ? 'Save and open This Week' : 'Save reviewed draft'}</button>}</footer><p role="status" aria-live="polite">{message}</p>
     </div>
   </section>;
 }
