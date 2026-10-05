@@ -15,13 +15,13 @@ const garamond = EB_Garamond({ subsets: ["latin"], variable: "--font-garamond" }
 
 export const metadata: Metadata = {
   title: {
-    default: "DIET Student Tracker",
-    template: "%s | DIET Accelerator",
+    default: "Mastrevo | Student Portal",
+    template: "%s | Mastrevo",
   },
-  description: "Private ICAN Professional exam-preparation tracking portal by DIET Accelerator.",
+  description: "Private ICAN Professional exam-preparation tracking portal by Mastrevo.",
   icons: {
-    icon: "/brand/diet-icon.png",
-    apple: "/brand/diet-icon.png",
+    icon: "/brand/mastrevo-icon.png",
+    apple: "/brand/mastrevo-icon.png",
   },
 };
 
