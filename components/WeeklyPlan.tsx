@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type { Paper, Profile } from '@/lib/types';
 import { PlanSetup } from './PlanSetup';
 import { capacity, DAYS, parseDraft, propose, type PlanDraft, type ProposedSession } from '@/lib/plan-setup';
 import styles from './WeeklyPlan.module.css';
+import { emptyAccount, loadPlanAccount, savePlanAccount, parseActive, type ActivePlan, type PlanAccount } from '@/lib/weekly-plan-storage';
 
 const TABS = [['this-week','This Week'],['next-week','Next Week'],['calendar','Calendar'],['lectures','Lectures'],['setup','Plan Setup']] as const;
 function dateInZone(zone: string) { return new Intl.DateTimeFormat('en-CA',{timeZone:zone,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()); }
@@ -14,25 +15,69 @@ function addDays(date: string, count: number) { const d = new Date(`${date}T12:0
 function monday(date: string) { return addDays(date,-((new Date(`${date}T12:00:00Z`).getUTCDay()+6)%7)); }
 function labelDate(date: string) { return new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',timeZone:'UTC'}).format(new Date(`${date}T12:00:00Z`)); }
 function duration(minutes: number) { return `${Math.floor(minutes/60)}h${minutes%60 ? ` ${minutes%60}m` : ''}`; }
-interface ActivePlan { version: 1; draft: PlanDraft; paperIds: string[]; savedAt: string }
 interface DatedSession extends ProposedSession { date: string }
 export function WeeklyPlan({ student, papers, preview = false }: { student: Profile; papers: Paper[]; preview?: boolean }) {
+  return <WeeklyPlanContent key={`${preview}:${student.id}:${student.level}`} student={student} papers={papers} preview={preview}/>;
+}
+function WeeklyPlanContent({student,papers,preview}: {student:Profile;papers:Paper[];preview:boolean}) {
   const params = useSearchParams(), pathname = usePathname(), router = useRouter();
   const [plan,setPlan] = useState<ActivePlan|null>(null), [ready,setReady] = useState(false), [error,setError] = useState(''), [filter,setFilter] = useState('all'), [calendarOffset,setCalendarOffset] = useState(0);
   const [opened,setOpened] = useState<DatedSession|null>(null);
   const key = `diet:weekly-plan:v1:${preview?'preview:':''}${student.id}:${student.level}`;
+  const [account,setAccount] = useState<PlanAccount>(emptyAccount), [retry,setRetry] = useState(0);
+  const [legacy,setLegacy] = useState<PlanAccount|null>(null), [importing,setImporting] = useState(false);
+  const saving = useRef(false);
+  const draftKey = `diet:plan-setup:v1:${preview?'preview:':''}${student.id}:${student.level}`;
   useEffect(() => {
-    try { const raw = localStorage.getItem(key); if(raw) { const saved=JSON.parse(raw); const draft=parseDraft(saved.draft); if(saved.version===1 && draft && Array.isArray(saved.paperIds) && saved.paperIds.every((id:unknown)=>typeof id==='string') && typeof saved.savedAt==='string') setPlan({...saved,draft}); else setError('Your saved timetable could not be read. Review Plan Setup to create it again.'); } }
-    catch { setError('Your browser could not load the saved timetable. Plan Setup remains available.'); }
-    setReady(true);
-  },[key]);
+    let cancelled = false;
+    setReady(false); setError('');
+    async function load() {
+      try {
+        let next = emptyAccount();
+        if (!preview) next = await loadPlanAccount(student.id,student.level);
+        let browserPlan = emptyAccount();
+        try {
+          const raw = localStorage.getItem(key), rawDraft = localStorage.getItem(draftKey);
+          browserPlan.active = raw ? parseActive(JSON.parse(raw)) : null;
+          browserPlan.draft = rawDraft ? parseDraft(JSON.parse(rawDraft)) : browserPlan.active?.draft || null;
+        } catch { if(preview) throw new Error('Browser storage could not be read. Enable browser storage and retry.'); }
+        if (cancelled) return;
+        if(preview) next=browserPlan;
+        else if(!next.revision && (browserPlan.draft || browserPlan.active)) setLegacy(browserPlan);
+        setAccount(next); setPlan(next.active); setReady(true);
+      } catch(e) { if(!cancelled) setError(e instanceof Error ? e.message : 'Your plan could not be loaded.'); }
+    }
+    void load();
+    return () => { cancelled=true; };
+  },[key,draftKey,preview,student.id,student.level,retry]);
   const rawTab=params.get('plan');
   const tab=TABS.some(([id])=>id===rawTab) ? rawTab! : (plan?'this-week':'setup');
   function href(id: string) { const q=new URLSearchParams(params.toString());q.set('plan',id);q.delete('setup');return `${pathname}?${q}`; }
-  function activate(draft: PlanDraft) {
+  async function persist(draft: PlanDraft, active: ActivePlan|null) {
+    if(saving.current) throw new Error('A save is already in progress.');
+    saving.current=true;
+    try {
+      if(preview) {
+        localStorage.setItem(draftKey,JSON.stringify(draft));
+        if(active) localStorage.setItem(key,JSON.stringify(active));
+        setAccount({...account,draft,active});
+      } else setAccount(await savePlanAccount(student.id,student.level,account,draft,active));
+      setPlan(active); setError(''); setLegacy(null);
+    } finally { saving.current=false; }
+  }
+  async function activate(draft: PlanDraft) {
     const next: ActivePlan={version:1,draft,paperIds:papers.map(p=>p.id),savedAt:new Date().toISOString()};
-    try { localStorage.setItem(key,JSON.stringify(next)); setPlan(next); setError(''); router.push(href('this-week'),{scroll:false}); }
-    catch { throw new Error('The timetable could not be saved. Browser storage may be full or blocked.'); }
+    await persist(draft,next);
+    router.push(href('this-week'),{scroll:false});
+  }
+  async function importLegacy() {
+    if(!legacy) return;
+    const draft=legacy.draft || legacy.active?.draft;
+    if(!draft) return;
+    setImporting(true);
+    try { await persist(draft,legacy.active); }
+    catch(e) { setError(e instanceof Error ? e.message : 'Import failed. Your browser copy is unchanged.'); }
+    finally { setImporting(false); }
   }
   const today=dateInZone(plan?.draft.timezone || 'Africa/Lagos'), start=monday(today);
   const removed=plan?.paperIds.filter(id=>!papers.some(p=>p.id===id)) || [];
@@ -42,13 +87,14 @@ export function WeeklyPlan({ student, papers, preview = false }: { student: Prof
   const visible=sessions.filter(s=>filter==='all'||s.paperId===filter);
   const scheduled=sessions.reduce((n,s)=>n+s.duration,0);
   const name=(id:string)=>papers.find(p=>p.id===id)?.name || 'Subject no longer selected';
-  if(!ready)return <p role="status">Loading Weekly Plan…</p>;
+  if(!ready)return error ? <div role="alert"><p>{error}</p><button onClick={()=>setRetry(n=>n+1)}>Retry loading plan</button></div> : <p role="status">Loading Weekly Plan…</p>;
   return <section className={styles.page} aria-label="Weekly Plan">
     <header className={styles.header}><div><span className={styles.eyebrow}>YOUR STUDY ROUTINE</span><h2>Weekly Plan</h2><p>A clear place for the preparation ahead.</p></div><span className={styles.badge}>{student.level}</span></header>
-    <p className={styles.notice}>Working prototype · Your reviewed timetable is saved on this browser only. Study activity and account-wide saving are not connected yet.</p>
+    <p className={styles.notice}>{preview ? 'Preview · Plans are saved on this browser only.' : 'Save your draft or reviewed timetable to your account and return on another device.'} Study activity recording is not connected yet.</p>
     <nav className={styles.tabs} aria-label="Weekly Plan sections">{TABS.map(([id,label])=><Link key={id} href={href(id)} aria-current={tab===id?'page':undefined} onClick={()=>{setOpened(null);setFilter('all');}}>{label}</Link>)}</nav>
     {error && <p role="alert" className={styles.notice}>{error}</p>}
-    {tab==='setup'?<PlanSetup student={student} papers={papers} preview={preview} onReviewed={activate}/>:!plan?<div className={styles.empty}><h3>Start with a week that fits your life.</h3><p>Choose your study windows and review your plan. Your sessions will then appear here.</p><Link className={styles.primary} href={href('setup')}>Set up my plan →</Link></div>:<>
+    {legacy && <div className={styles.notice}><p>A previous plan was found on this browser. You can copy it to your account. Your browser copy will be kept.</p><button disabled={importing} onClick={importLegacy}>{importing?'Importing…':'Import browser plan'}</button></div>}
+    {tab==='setup'?<PlanSetup key={legacy?'legacy':'account'} student={student} papers={papers} preview={preview} initialDraft={account.draft || plan?.draft || undefined} onSaveDraft={draft=>persist(draft,plan)} onReviewed={activate}/>:!plan?<div className={styles.empty}><h3>Start with a week that fits your life.</h3><p>Choose your study windows and review your plan. Your sessions will then appear here.</p><Link className={styles.primary} href={href('setup')}>Set up my plan →</Link></div>:<>
     {removed.length>0 && <p className={styles.notice}>Some subjects have been removed from your profile. Their blocks are hidden; review Plan Setup to redistribute that time.</p>}
     {tab==='lectures'?<><div className={styles.sectionHead}><div><h3>Your lecture timetable</h3><p>Recurring lecture windows · {plan.draft.timezone}</p></div><Link href={href('setup')}>Edit lecture times →</Link></div>{plan.draft.mode==='self'?<div className={styles.empty}><h3>You selected self study</h3><p>If you attend classes, switch to lecture based or hybrid study in Plan Setup.</p></div>:!plan.draft.lectures.length?<div className={styles.empty}><h3>No lecture times added yet</h3><p>Add your class times in Plan Setup so independent study will not overlap them.</p></div>:<div className={styles.days}>{plan.draft.lectures.map((l,i)=><article className={styles.day} key={i}><h4>{DAYS[l.day]}</h4><p>{l.start}–{l.end}</p><span className={styles.badge}>Reserved lecture time</span></article>)}</div>}<div className={styles.pending}><h4>Still to connect</h4><p>Lecture subjects, attendance, post-lecture checks and missed-lecture catch-up will be added in the lecture workflow stage.</p></div></>:<>
     <div className={styles.sectionHead}><div><h3>{tab==='next-week'?'Looking ahead':tab==='calendar'?'Your study calendar':'This week at a glance'}</h3><p>{labelDate(week)} – {labelDate(addDays(week,6))} · {plan.draft.timezone}</p></div><Link href={href('setup')}>Adjust plan →</Link></div>

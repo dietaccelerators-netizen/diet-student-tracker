@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type { Paper, Profile } from '@/lib/types';
-import { DAYS, capacity, newDraft, parseDraft, propose, windowErrors, type PlanDraft, type Window } from '@/lib/plan-setup';
+import { DAYS, capacity, newDraft, propose, windowErrors, type PlanDraft, type Window } from '@/lib/plan-setup';
 import styles from './PlanSetup.module.css';
 
 const STEPS = ['Approach', 'Availability', 'Preferences', 'Review'];
@@ -16,17 +16,11 @@ function Windows({ value, onChange, label }: { value: Window[]; onChange: (v: Wi
     <button type="button" aria-label={`Remove ${label} window ${i+1}`} onClick={() => onChange(value.filter((_,j) => j !== i))}>Remove</button>
   </div>)}<button type="button" onClick={() => onChange([...value,{day:0,start:'18:00',end:'19:00'}])}>+ Add time window</button></fieldset>;
 }
-export function PlanSetup({ student, papers, preview = false, onReviewed }: { student: Profile; papers: Paper[]; preview?: boolean; onReviewed?: (draft: PlanDraft) => void }) {
+export function PlanSetup({ student, papers, preview = false, initialDraft, onSaveDraft, onReviewed }: { student: Profile; papers: Paper[]; preview?: boolean; initialDraft?: PlanDraft; onSaveDraft: (draft: PlanDraft) => Promise<void>; onReviewed: (draft: PlanDraft) => Promise<void> }) {
   const router = useRouter(), pathname = usePathname(), params = useSearchParams();
   const requested = Number(params.get('setup') || 1);
   const step = Number.isInteger(requested) && requested >= 1 && requested <= 4 ? requested - 1 : 0;
-  const [draft,setDraft] = useState<PlanDraft>(newDraft), [loaded,setLoaded] = useState(false), [message,setMessage] = useState(''), [accepted,setAccepted] = useState(false), [errors,setErrors] = useState<string[]>([]);
-  const storageKey = `diet:plan-setup:v1:${preview ? 'preview:' : ''}${student.id}:${student.level}`;
-  useEffect(() => {
-    try { const raw = localStorage.getItem(storageKey); if (raw) { const saved = parseDraft(JSON.parse(raw)); if (saved) setDraft(saved); else setMessage('The old draft could not be restored. Please enter your preferences again.'); } }
-    catch { setMessage('Browser storage is unavailable. You can try the flow, but drafts cannot be retained.'); }
-    setLoaded(true);
-  }, [storageKey]);
+  const [draft,setDraft] = useState<PlanDraft>(()=>initialDraft || newDraft()), [saving,setSaving] = useState(false), [message,setMessage] = useState(''), [accepted,setAccepted] = useState(false), [errors,setErrors] = useState<string[]>([]);
   function update(patch: Partial<PlanDraft>) { setDraft(d => ({...d,...patch})); setAccepted(false); setMessage(''); setErrors([]); }
   function validate(to: number) {
     const issues: string[] = [];
@@ -38,15 +32,22 @@ export function PlanSetup({ student, papers, preview = false, onReviewed }: { st
     return [...new Set(issues)];
   }
   function navigate(next: number) { if (next > step) { const problems = validate(next); setErrors(problems); if (problems.length) return; } const q = new URLSearchParams(params.toString()); q.set('setup',String(next+1)); router.push(`${pathname}?${q}`,{scroll:false}); setMessage(''); }
-  function save(reviewed = false) { try { localStorage.setItem(storageKey,JSON.stringify(draft)); if (reviewed && onReviewed) onReviewed(draft); setMessage('Draft saved on this browser. You can return here to continue.'); } catch (error) { setMessage(error instanceof Error ? error.message : 'Draft could not be saved. Browser storage may be blocked or full.'); } }
+  async function save(reviewed = false) {
+    if(saving) return;
+    setSaving(true); setMessage('Saving…');
+    try {
+      await (reviewed ? onReviewed(draft) : onSaveDraft(draft));
+      setMessage(preview ? 'Draft saved on this browser.' : 'Saved to your account. You can continue on another device.');
+    } catch(error) { setMessage(error instanceof Error ? error.message : 'Your plan could not be saved. Please retry.'); }
+    finally { setSaving(false); }
+  }
   const sessions = propose(draft,papers.map(p => p.id)), available = capacity(draft), scheduled = sessions.reduce((n,s) => n+s.duration,0);
   const target = draft.approach === 'custom' ? papers.reduce((n,p) => n+(draft.allocations[p.id] || 0)*60,0) : null;
   const shortfall = target === null ? 0 : Math.max(0,target-scheduled);
-  if (!loaded) return <p role="status">Loading your setup…</p>;
   return <section className={styles.setup} aria-label="Weekly plan setup">
     <header><span className={styles.eyebrow}>WEEKLY PLAN · WORKING PROTOTYPE</span><h2>Make room for your preparation.</h2><p>Set up a week that works around your life.</p></header>
-    <p className={styles.notice}>Save a draft to continue later, or review and save your timetable to open This Week. Both stay on this browser for now.</p>
-    <nav aria-label="Plan setup steps" className={styles.steps}>{STEPS.map((name,i) => <button key={name} onClick={() => navigate(i)} aria-current={step === i ? 'step' : undefined}><span>{i+1}</span>{name}</button>)}</nav>
+    <p className={styles.notice}>Save a draft to continue later, or review and save your timetable to open This Week. {preview ? 'Preview plans stay on this browser.' : 'Both are saved privately to your account. Saving a draft does not change your reviewed timetable.'}</p>
+    <fieldset disabled={saving} style={{border:0,padding:0,margin:0,minWidth:0}}><nav aria-label="Plan setup steps" className={styles.steps}>{STEPS.map((name,i) => <button key={name} onClick={() => navigate(i)} aria-current={step === i ? 'step' : undefined}><span>{i+1}</span>{name}</button>)}</nav>
     <div className={styles.card}><span className={styles.eyebrow}>STEP {step+1} OF 4</span><h3>{['Choose your approach','When can you study?','Make the plan work for you','Review your proposed week'][step]}</h3>
     {step === 0 && <><div className={styles.summary}><div><small>Student</small><b>{student.fullName}</b></div><div><small>Stage</small><b>{student.level}</b></div><div><small>Exam diet</small><b>{student.examDiet || 'Not set'}</b></div></div><p>Your subjects: {papers.map(p => p.name).join(', ') || 'No subjects selected'}</p>
       <fieldset><legend>Planning approach</legend><div className={styles.choices}>{(['recommended','custom'] as const).map(v => <label key={v}><input type="radio" name="approach" checked={draft.approach === v} onChange={() => update({approach:v})}/><span><b>{v === 'recommended' ? 'Help me distribute my time' : 'Build my own plan'}</b><small>{v === 'recommended' ? 'A provisional, balanced allocation across your selected subjects.' : 'Set the weekly hours you want for each subject.'}</small></span></label>)}</div></fieldset>
@@ -64,7 +65,7 @@ export function PlanSetup({ student, papers, preview = false, onReviewed }: { st
       {!sessions.length ? <p className={styles.warning}>No sessions fit yet. Add availability, shorten your session length or allow short study blocks.</p> : <div className={styles.table}><table><thead><tr><th>Day</th><th>Time</th><th>Subject</th><th>Length</th></tr></thead><tbody>{sessions.map((s,i) => <tr key={i}><td>{DAYS[s.day]}</td><td>{s.start}–{s.end}</td><td>{papers.find(p => p.id === s.paperId)?.name}</td><td>{s.duration} min</td></tr>)}</tbody></table></div>}
       <label className={styles.check}><input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)}/>I have reviewed this proposal{shortfall > 0 ? ' and accept the lower scheduled hours' : ''}.</label></>}
     {errors.length > 0 && <div role="alert" className={styles.warning}><ul>{errors.map(e => <li key={e}>{e}</li>)}</ul></div>}
-    <footer><button disabled={step === 0} onClick={() => navigate(step-1)}>Back</button><button onClick={() => save()}>Save draft</button>{step < 3 ? <button className={styles.primary} onClick={() => navigate(step+1)}>Continue →</button> : <button className={styles.primary} disabled={!accepted || !sessions.length} onClick={() => { const problems = validate(3); setErrors(problems); if (!problems.length) save(true); }}>{onReviewed ? 'Save and open This Week' : 'Save reviewed draft'}</button>}</footer><p role="status" aria-live="polite">{message}</p>
-    </div>
+    <footer><button disabled={step === 0} onClick={() => navigate(step-1)}>Back</button><button onClick={() => save()}>Save draft</button>{step < 3 ? <button className={styles.primary} onClick={() => navigate(step+1)}>Continue →</button> : <button className={styles.primary} disabled={!accepted || !sessions.length} onClick={() => { const problems = validate(3); setErrors(problems); if (!problems.length) save(true); }}>{saving ? 'Saving…' : 'Save and open This Week'}</button>}</footer><p role="status" aria-live="polite">{message}</p>
+    </div></fieldset>
   </section>;
 }
