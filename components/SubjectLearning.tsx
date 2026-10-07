@@ -1,6 +1,7 @@
 "use client";
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { TopicLessonLayout } from './TopicLessonLayout';
 import { SubjectSyllabus } from './SubjectSyllabus';
 import { LessonWorkspace } from './LessonWorkspace';
 import type { Paper, Topic, TopicProgress } from '@/lib/types';
@@ -8,12 +9,13 @@ import styles from './SubjectLearning.module.css';
 
 export function SubjectLearning({paper,topics,progress,level,backHref,onUpdate,preview=false}:{paper:Paper;topics:Topic[];progress:TopicProgress[];level:string;backHref:string;onUpdate:(id:string,patch:Partial<TopicProgress>)=>void;preview?:boolean}) {
  const pathname=usePathname(),params=useSearchParams();
- const subjectParams=new URLSearchParams(params.toString());subjectParams.delete('lesson');
+ const subjectParams=new URLSearchParams(params.toString());subjectParams.delete('lesson');subjectParams.delete('lessonLayout');
  const subjectHref=pathname+(subjectParams.size?'?'+subjectParams.toString():'');
  const tab=params.get('subjectView')==='syllabus'?'syllabus':'path';
  const tabHref=(view:string)=>{const q=new URLSearchParams(subjectParams);q.set('subjectView',view);return pathname+'?'+q.toString();};
  const lessonHref=(id:string)=>{const q=new URLSearchParams(subjectParams);q.set('lesson',id);return pathname+'?'+q.toString();};
  const selected=topics.find(t=>t.id===params.get('lesson'));
+ if(params.get('lessonLayout')==='sample')return <TopicLessonLayout subject={paper.name} topic="Sample topic layout" backHref={subjectHref}/>;
  if(selected)return <LessonWorkspace key={selected.id} paper={paper} topics={topics} topic={selected} progress={progress} level={level} preview={preview} subjectHref={subjectHref} lessonHref={lessonHref} onUpdate={onUpdate}/>;
  if(params.has('lesson'))return <section className="subject-empty"><h1>Topic not found in this subject</h1><Link href={subjectHref}>Back to subject</Link></section>;
  const ordered=[...topics].sort((a,b)=>a.displayOrder-b.displayOrder);
