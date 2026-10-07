@@ -4,7 +4,7 @@ import { blockKey, elapsed, isOpen, loadSessions, saveSession, timerText, transi
 import type { Paper, Profile } from '@/lib/types';
 import styles from './StudySessions.module.css';
 
-export function StudySessions({student,papers,week,end,selected,preview,onClose}: {student:Profile;papers:Paper[];week:string;end:string;selected:StudyBlock|null;preview:boolean;onClose:()=>void}) {
+export function StudySessions({student,papers,week,end,selected,preview,onClose,onActivity}: {student:Profile;papers:Paper[];week:string;end:string;selected:StudyBlock|null;preview:boolean;onClose:()=>void;onActivity?:(rows:StudySession[],ready:boolean)=>void}) {
   const [rows,setRows]=useState<StudySession[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[reload,setReload]=useState(0);
   const target=useRef<HTMLElement>(null);
   useEffect(()=>{
@@ -14,6 +14,7 @@ export function StudySessions({student,papers,week,end,selected,preview,onClose}
     return()=>{cancelled=true;};
   },[student.id,student.level,week,end,preview,reload]);
   useEffect(()=>{if(selected)target.current?.scrollIntoView({behavior:'smooth',block:'start'});},[selected]);
+  useEffect(()=>{onActivity?.(rows,!loading&&!error);},[rows,loading,error,onActivity]);
   const active=rows.find(isOpen);
   const current=selected?rows.find(s=>s.block_key===blockKey(selected)):active;
   const history=rows.filter(s=>!isOpen(s)&&s.plan_date>=week&&s.plan_date<=end);

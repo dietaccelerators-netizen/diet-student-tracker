@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type { Paper, Profile } from '@/lib/types';
 import { PlanSetup } from './PlanSetup';
 import { StudySessions } from './StudySessions';
+import { blockKey, type StudySession } from '@/lib/study-sessions';
 import { capacity, DAYS, parseDraft, propose, type PlanDraft, type ProposedSession } from '@/lib/plan-setup';
 import styles from './WeeklyPlan.module.css';
 import { emptyAccount, loadPlanAccount, savePlanAccount, parseActive, type ActivePlan, type PlanAccount } from '@/lib/weekly-plan-storage';
@@ -24,6 +25,7 @@ function WeeklyPlanContent({student,papers,preview}: {student:Profile;papers:Pap
   const params = useSearchParams(), pathname = usePathname(), router = useRouter();
   const [plan,setPlan] = useState<ActivePlan|null>(null), [ready,setReady] = useState(false), [error,setError] = useState(''), [filter,setFilter] = useState('all'), [calendarOffset,setCalendarOffset] = useState(0);
   const [opened,setOpened] = useState<DatedSession|null>(null);
+  const [activity,setActivity]=useState<{week:string;rows:StudySession[];ready:boolean}>({week:'',rows:[],ready:false});
   const key = `diet:weekly-plan:v1:${preview?'preview:':''}${student.id}:${student.level}`;
   const [account,setAccount] = useState<PlanAccount>(emptyAccount), [retry,setRetry] = useState(0);
   const [legacy,setLegacy] = useState<PlanAccount|null>(null), [importing,setImporting] = useState(false);
@@ -87,6 +89,10 @@ function WeeklyPlanContent({student,papers,preview}: {student:Profile;papers:Pap
   const week=addDays(start,offset*7), sessions=recurring.map(s=>({...s,date:addDays(week,s.day)}));
   const visible=sessions.filter(s=>filter==='all'||s.paperId===filter);
   const scheduled=sessions.reduce((n,s)=>n+s.duration,0);
+  const onActivity=useCallback((rows:StudySession[],ready:boolean)=>setActivity({week,rows,ready}),[week]);
+  const activityReady=activity.week===week&&activity.ready;
+  const results=new Map(activityReady?activity.rows.map(s=>[s.block_key,s]):[]);
+  const followUp=visible.filter(s=>results.get(blockKey(s))?.status==='partial');
   const name=(id:string)=>papers.find(p=>p.id===id)?.name || 'Subject no longer selected';
   if(!ready)return error ? <div role="alert"><p>{error}</p><button onClick={()=>setRetry(n=>n+1)}>Retry loading plan</button></div> : <p role="status">Loading Weekly Plan…</p>;
   return <section className={styles.page} aria-label="Weekly Plan">
@@ -99,12 +105,13 @@ function WeeklyPlanContent({student,papers,preview}: {student:Profile;papers:Pap
     {removed.length>0 && <p className={styles.notice}>Some subjects have been removed from your profile. Their blocks are hidden; review Plan Setup to redistribute that time.</p>}
     {tab==='lectures'?<><div className={styles.sectionHead}><div><h3>Your lecture timetable</h3><p>Recurring lecture windows · {plan.draft.timezone}</p></div><Link href={href('setup')}>Edit lecture times →</Link></div>{plan.draft.mode==='self'?<div className={styles.empty}><h3>You selected self study</h3><p>If you attend classes, switch to lecture based or hybrid study in Plan Setup.</p></div>:!plan.draft.lectures.length?<div className={styles.empty}><h3>No lecture times added yet</h3><p>Add your class times in Plan Setup so independent study will not overlap them.</p></div>:<div className={styles.days}>{plan.draft.lectures.map((l,i)=><article className={styles.day} key={i}><h4>{DAYS[l.day]}</h4><p>{l.start}–{l.end}</p><span className={styles.badge}>Reserved lecture time</span></article>)}</div>}<div className={styles.pending}><h4>Still to connect</h4><p>Lecture subjects, attendance, post-lecture checks and missed-lecture catch-up will be added in the lecture workflow stage.</p></div></>:<>
     <div className={styles.sectionHead}><div><h3>{tab==='next-week'?'Looking ahead':tab==='calendar'?'Your study calendar':'This week at a glance'}</h3><p>{labelDate(week)} – {labelDate(addDays(week,6))} · {plan.draft.timezone}</p></div><Link href={href('setup')}>Adjust plan →</Link></div>
-    <div className={styles.stats}><div><small>Scheduled study</small><strong>{duration(scheduled)}</strong></div><div><small>Study blocks</small><strong>{sessions.length}</strong></div><div><small>Available each week</small><strong>{duration(capacity(plan.draft))}</strong></div><div><small>Study activity</small><strong>Session log below</strong></div></div>
+    <div className={styles.stats}><div><small>Scheduled study</small><strong>{duration(scheduled)}</strong></div><div><small>Study blocks</small><strong>{sessions.length}</strong></div><div><small>Available each week</small><strong>{duration(capacity(plan.draft))}</strong></div><div><small>Completed blocks</small><strong>{activityReady?`${sessions.filter(s=>results.get(blockKey(s))?.status==='completed').length} / ${sessions.length}`:'—'}</strong></div></div>
     <p className={styles.hint}>{tab==='next-week'?'This is a recurring proposal for next week, not a record of completed work.':'These are planned subject blocks. Past dates do not mean missed or completed sessions.'}</p>
-    <div className={styles.controls}><label>Subject<select value={filter} onChange={e=>setFilter(e.target.value)}><option value="all">All subjects</option>{papers.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>{tab==='calendar' && <div className={styles.calendarControls}><button onClick={()=>setCalendarOffset(n=>n-1)}>← Previous week</button><button onClick={()=>setCalendarOffset(0)}>Current week</button><button onClick={()=>setCalendarOffset(n=>n+1)}>Next week →</button></div>}</div>
-    <StudySessions student={student} papers={papers} week={week} end={addDays(week,6)} selected={opened} preview={preview} onClose={()=>setOpened(null)}/>
-    <div className={tab==='calendar'?styles.calendar:styles.days}>{DAYS.map((day,i)=>{const date=addDays(week,i), blocks=visible.filter(s=>s.day===i);return <article key={day} className={`${styles.day} ${date===today?styles.today:''}`}><div className={styles.dayHead}><h4>{day} <small>{labelDate(date)}</small></h4>{date===today&&<span className={styles.badge}>Today</span>}</div>{blocks.length?blocks.map((s,j)=><div className={styles.session} key={`${s.start}-${s.paperId}-${j}`}><div><span className={styles.time}>{s.start}–{s.end} · {s.duration} min</span><h5>{name(s.paperId)}</h5><span className={styles.hint}>Planned study · Topic to be selected</span></div><button onClick={()=>setOpened(s)}>View session</button></div>):<p className={styles.hint}>{filter==='all'?'No study blocks planned.':'No blocks for this subject.'}</p>}</article>})}</div>
-    <div className={styles.pending}><h4>Next parts of Weekly Plan</h4><p>Automatic catch-up scheduling and links to Learning Report will follow. Session results currently appear in the saved session history above.</p></div>
+    <div className={styles.controls}><label>Subject<select value={filter} onChange={e=>setFilter(e.target.value)}><option value="all">All subjects</option>{papers.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>{tab==='calendar' && <div className={styles.calendarControls}><button onClick={()=>{setOpened(null);setCalendarOffset(n=>n-1);}}>← Previous week</button><button onClick={()=>{setOpened(null);setCalendarOffset(0);}}>Current week</button><button onClick={()=>{setOpened(null);setCalendarOffset(n=>n+1);}}>Next week →</button></div>}</div>
+    <StudySessions student={student} papers={papers} week={week} end={addDays(week,6)} selected={opened} preview={preview} onActivity={onActivity} onClose={()=>setOpened(null)}/>
+    {activityReady&&followUp.length>0&&<section className={styles.pending} aria-label="Needs follow-up"><h3>Needs follow-up</h3><p>These sessions were partly completed. Review your saved notes before choosing another study block for the remaining work.</p>{followUp.map(s=>{const result=results.get(blockKey(s))!;return <div className={styles.session} key={result.id}><div><h4>{name(s.paperId)}</h4><p>{result.goal}</p><small>{labelDate(s.date)} · {Math.round(result.elapsed_seconds/60)} min recorded</small>{result.notes&&<p style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{result.notes}</p>}</div><button onClick={()=>setOpened(s)}>Review result</button></div>;})}</section>}
+    <div className={tab==='calendar'?styles.calendar:styles.days}>{DAYS.map((day,i)=>{const date=addDays(week,i), blocks=visible.filter(s=>s.day===i);return <article key={day} className={`${styles.day} ${date===today?styles.today:''}`}><div className={styles.dayHead}><h4>{day} <small>{labelDate(date)}</small></h4>{date===today&&<span className={styles.badge}>Today</span>}</div>{blocks.length?blocks.map((s,j)=><div className={styles.session} key={`${s.start}-${s.paperId}-${j}`}><div><span className={styles.time}>{s.start}–{s.end} · {s.duration} min</span><h5>{name(s.paperId)}</h5><span className={styles.badge}>{!activityReady?'Checking activity…':results.get(blockKey(s))?.status==='completed'?'Completed':results.get(blockKey(s))?.status==='partial'?'Partly completed':results.get(blockKey(s))?.status==='running'?'In progress':results.get(blockKey(s))?.status==='paused'?'Paused':s.date<today?'No session recorded':'Planned'}</span>{results.get(blockKey(s))&&<p className={styles.hint}>{results.get(blockKey(s))!.goal} · {Math.round(results.get(blockKey(s))!.elapsed_seconds/60)} saved min</p>}</div><button onClick={()=>setOpened(s)}>View session</button></div>):<p className={styles.hint}>{filter==='all'?'No study blocks planned.':'No blocks for this subject.'}</p>}</article>})}</div>
+    <div className={styles.pending}><h4>Your study record</h4><p>Session results are reflected in Learning Report. Unrecorded past blocks are not automatically marked as missed. Catch-up scheduling will be added separately.</p>{!preview&&<Link href="/dashboard?view=report">View Learning Report →</Link>}</div>
     </>}
     </>}
   </section>;
