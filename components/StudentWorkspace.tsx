@@ -1,5 +1,7 @@
 "use client";
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { LessonPracticePanel } from './LessonPracticePanel';
 import { StudyActivityReport } from './StudyActivityReport';
 import { useTracker } from './TrackerProvider';
 import { PracticeRoom } from './PracticeRoom';
@@ -12,6 +14,7 @@ import { ManagePapers } from './ManagePapers';
 import { getStudent, getStudentPapers, getStudentProgress } from '@/lib/selectors';
 import { resourcesFor, stageFor, SUBJECTS } from '@/lib/stages';
 export function StudentWorkspace({studentId,view='home'}:{studentId:string;view?:string}) {
+ const params=useSearchParams();
  const {state}=useTracker();
  const student=getStudent(state,studentId); if(!student) return <p>Unable to load your profile. Please sign in again.</p>;
  const papers=getStudentPapers(state,studentId), progress=getStudentProgress(state,studentId);
@@ -19,6 +22,7 @@ export function StudentWorkspace({studentId,view='home'}:{studentId:string;view?
  const names:Record<string,string>={home:'My learning space',subjects:'My subjects',weekly:'Weekly plan',practice:'Practice room',report:'Learning report',profile:'My profile',resources:'Study resources'};
  const selected=names[view]?view:'home';
  if(selected==='subjects')return <StudentSubjects state={state} studentId={studentId} managePapers={<ManagePapers studentId={studentId}/>}/>;
+ if(selected==='practice'&&params.get('fromLesson')==='1')return <div className="student-workspace"><div className="workspace-toolbar"><h1>Practice Room</h1></div><LessonPracticePanel key={params.toString()} papers={papers} topics={state.topics}/></div>;
  return <div className="student-workspace"><div className={`workspace-toolbar ${selected==='home'?'home-toolbar-hidden':''}`}><div><span className="eyebrow">{stage?.startsWith('ATS')?'ATSWA':'ICAN'} / {stageLabel || 'Student'}</span><h1>{names[selected]}</h1></div><Link href="/dashboard?view=profile" className="student-avatar" aria-label="Open my profile">{student.fullName.split(' ').map(n=>n[0]).slice(0,2).join('')}</Link></div>
  {selected==='home' && <StudentOverview studentId={studentId}/>}
  {selected==='weekly' && <><WeeklyPlan key={studentId} student={student} papers={papers}/><details><summary>Existing topic priorities</summary><ThisWeekList studentId={studentId}/></details></>}

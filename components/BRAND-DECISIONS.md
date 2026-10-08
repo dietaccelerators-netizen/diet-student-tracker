@@ -27,3 +27,8 @@ User authorised applicable adjustments now, and recording remaining guidance for
 - Current work remains layout/setup only. Do not ingest documents, invent syllabus weights, questions, exam readiness or mastery.
 - Stage 4 lesson preview complete. Stage 5 persistent progress is not implemented. User wants brand alignment before Stage 6; clarify preview vs saved behaviour when implementing that stage.
 - No AI product features. Preserve existing accounts, records and study tracking.
+
+## Stage 6 — lesson-to-practice setup
+- Lesson navigation carries validated subject/topic identifiers and a sample section index into Practice Room. Return preserves the section and learning content view.
+- Practice scope and mode controls are preview-only. Question slots remain empty; submission is disabled. Existing general sample quizzes remain separate.
+- No new curriculum, scores, attempts or persistent completion records are created. Stage 5 saved tracking remains deferred.

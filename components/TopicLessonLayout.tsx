@@ -1,6 +1,7 @@
 "use client";
 import { useState, type ReactNode } from 'react';
 import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
 import styles from './TopicLessonLayout.module.css';
 const sections=['Section title 1','Section title 2','Section title 3','Section title 4'];
 const panels=[
@@ -10,12 +11,15 @@ const panels=[
  {title:'Related Past Questions',heading:'Connect learning to practice',description:'Verified past questions will appear here once they have been added and linked to this section.',slots:['Question reference and exam diet','Question preview','Practice action']},
  {title:'Quick Review',heading:'Review the key ideas',description:'Review prompts and a concise recap will be added here.',slots:['Key points to remember','Recall prompts','Section recap']},
 ];
-export function TopicLessonLayout({subject,topic,backHref,children}:{subject:string;topic:string;backHref:string;children?:ReactNode}) {
- const [section,setSection]=useState(0),[panel,setPanel]=useState(0);
+export function TopicLessonLayout({subject,topic,backHref,subjectId,topicId,children}:{subject:string;topic:string;backHref:string;subjectId:string;topicId?:string;children?:ReactNode}) {
+ const params=useSearchParams(),pathname=usePathname();
+ const [section,setSection]=useState(()=>/^[0-3]$/.test(params.get('section')||'')?Number(params.get('section')):0),[panel,setPanel]=useState(()=>/^[0-4]$/.test(params.get('content')||'')?Number(params.get('content')):0);
+ const practiceParams=new URLSearchParams({view:'practice',fromLesson:'1',subject:subjectId,topic:topicId||'layout-sample',section:String(section),content:String(panel)});
+ if(pathname==='/login'){practiceParams.set('mode','preview');practiceParams.set('stage',params.get('stage')||'Professional');}
+ const practiceHref=(pathname==='/login'?'/login':'/dashboard')+'?'+practiceParams.toString();
  const [completed,setCompleted]=useState<number[]>([]);
- const [practice,setPractice]=useState(false);
  const [notice,setNotice]=useState('');
- const chooseSection=(index:number)=>{setSection(index);setPanel(0);setPractice(false);setNotice('');};
+ const chooseSection=(index:number)=>{setSection(index);setPanel(0);setNotice('');};
  const content=panels[panel];
  return <section className={styles.page} aria-label="Topic learning workspace">
   <Link className={styles.back} href={backHref}>← Back to {subject}</Link>
@@ -29,8 +33,7 @@ export function TopicLessonLayout({subject,topic,backHref,children}:{subject:str
     <section className={styles.reading} aria-label={content.title}><span className={styles.label}>CONTENT PLACEHOLDER</span><h3>{content.heading}</h3><p>{content.description}</p><div className={styles.slots}>{content.slots.map((title,i)=><div key={title}><span>{String(i+1).padStart(2,'0')}</span><div><h4>{title}</h4><p>Reserved for approved lesson content.</p></div></div>)}</div></section>
     <div className={styles.controls}><button type="button" disabled={section===0} onClick={()=>chooseSection(section-1)}>← Previous section</button><button type="button" className={styles.primary} onClick={()=>{const done=completed.includes(section);setCompleted(done?completed.filter(n=>n!==section):[...completed,section]);setNotice(done?'Section unmarked in this preview.':'Section marked complete in this preview only.');}}>{completed.includes(section)?'Undo completion':'Mark complete'} <span>(preview)</span></button><button type="button" disabled={section===sections.length-1} onClick={()=>chooseSection(section+1)}>Next section →</button></div>
     <p className={styles.notice} role="status">{notice||'Completion here demonstrates the interaction only.'}</p>
-    <section className={styles.practice}><div><h3>Test my understanding</h3><p>Practice will open with this subject, topic and section selected.</p></div><button type="button" aria-expanded={practice} aria-controls="practice-handoff-preview" onClick={()=>setPractice(!practice)}>{practice?'Close preview':'Preview practice handoff'} →</button></section>
-    {practice&&<section className={styles.handoff} id="practice-handoff-preview" aria-label="Practice handoff preview"><h3>Practice context</h3><dl><div><dt>Subject</dt><dd>{subject}</dd></div><div><dt>Topic</dt><dd>{topic}</dd></div><div><dt>Section</dt><dd>{sections[section]}</dd></div></dl><p>This is a preview. Questions and the connection to Practice Room will be added in a later stage.</p></section>}
+    <section className={styles.practice}><div><h3>Test my understanding</h3><p>Open Practice Room with this subject, topic and section selected.</p></div><Link className={styles.practiceLink} href={practiceHref}>Open Practice Room →</Link></section>
     {children}
    </div>
   </div>
