@@ -1,0 +1,17 @@
+.header{border-top-color:#08245c!important}
+:global(body):has(.header){--brand-navy:#08245c;--brand-blue:#0759e6;--brand-ice:#eef6ff;--brand-white:#fff;--forest:#08245c;--accelerator:#0759e6;--soft-white:#eef6ff;--ink:#08245c;--line:#d8e5f5;--muted:#526781;background:#eef6ff;color:#08245c;font-family:var(--font-inter),Arial,sans-serif}
+:global(body):has(.header) :global(h1),:global(body):has(.header) :global(h2),:global(body):has(.header) :global(h3),:global(body):has(.header) :global(h4),:global(body):has(.header) :global(button),:global(body):has(.header) :global(input),:global(body):has(.header) :global(select),:global(body):has(.header) :global(textarea),:global(body):has(.header) :global(p),:global(body):has(.header) :global(a){font-family:var(--font-inter),Arial,sans-serif}
+:global(body):has(.header) :global(h1){font-size:32px;line-height:40px;font-weight:700}
+:global(body):has(.header) :global(table),:global(body):has(.header) :global(progress){font-variant-numeric:tabular-nums}
+:global(body):has(.header) :global(.app-sidebar){background:#08245c!important}
+:global(body):has(.header) :global(.app-sidebar .nav-item.active){background:#0759e6!important}
+:global(body):has(.header) :global(.app-sidebar .nav-item:hover){background:#123b79!important}
+:global(body):has(.header) :global(.app-sidebar .nav-item){font-size:14px;line-height:20px}
+:global(body):has(.header) :global(.app-sidebar .sidebar-note){background:#0c306c!important;border-color:#335483!important}
+:global(body):has(.header) :global(.app-sidebar .sidebar-note h2){font-size:19px;line-height:28px;font-weight:600}
+:global(body):has(.header) :global(main){background:#eef6ff!important}
+:global(body):has(.header) :global(.account-badge){background:#eef6ff!important;color:#08245c!important}
+:global(body):has(.header) :global(.da-resume),:global(body):has(.header) :global(.ds-resources),:global(body):has(.header) :global(.home-preview-note){background:#eef6ff!important;color:#08245c}
+:global(body):has(.header) :global(.da-home h1),:global(body):has(.header) :global(.da-home h2),:global(body):has(.header) :global(.da-welcome p strong){color:#08245c}
+:global(body):has(.header) :global(.focus-ring:focus-visible){outline:3px solid #8ab7ff;outline-offset:3px}
+@media(max-width:600px){:global(body):has(.header) :global(h1){font-size:26px;line-height:34px}}
