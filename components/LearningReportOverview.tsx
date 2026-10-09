@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { StudyConsistencyReport } from './StudyConsistencyReport';
 import { SubjectProgressReport } from './SubjectProgressReport';
 import { useState, type FormEvent } from 'react';
 import styles from './LearningReportOverview.module.css';
@@ -24,7 +25,7 @@ export function LearningReportOverview() {
   const [today] = useState(() => iso(new Date()));
   const [period,setPeriod] = useState<Period>('week');
   const [range,setRange] = useState<Range>(() => preset('week',today));
-  const [section,setSection] = useState<'overview'|'subjects'>('overview');
+  const [section,setSection] = useState<'overview'|'subjects'|'consistency'>('overview');
   const [empty,setEmpty] = useState(false);
   const [error,setError] = useState('');
   const [message,setMessage] = useState('');
@@ -44,8 +45,8 @@ export function LearningReportOverview() {
     <section className={styles.range} aria-label="Report period"><div><label className={styles.label} htmlFor="report-period">Report period</label><select id="report-period" value={period} onChange={e=>choose(e.target.value as Period)}><option value="week">This week so far</option><option value="previous">Last week</option><option value="month">Last 30 days</option><option value="custom">Custom dates</option></select></div><div><span className={styles.label}>Selected date range</span><strong aria-live="polite">{format(range.start)} – {format(range.end)}</strong></div><label className={styles.toggle}><input type="checkbox" checked={empty} onChange={e=>setEmpty(e.target.checked)}/> Preview no activity</label>
       {period==='custom' && <form className={styles.custom} onSubmit={apply}><label>Start date<input type="date" name="start" required max={today} defaultValue={range.start}/></label><label>End date<input type="date" name="end" required max={today} defaultValue={range.end}/></label><button type="submit">Apply dates</button>{error && <p role="alert">{error}</p>}</form>}
     </section>
-    <div className={styles.tabs} role="group" aria-label="Learning report sections"><button type="button" aria-pressed={section==='overview'} onClick={()=>setSection('overview')}>Overview</button><button type="button" aria-pressed={section==='subjects'} onClick={()=>setSection('subjects')}>Subject Progress</button></div>
-    {section==='subjects'?<SubjectProgressReport empty={empty} periodLabel={`${format(range.start)} – ${format(range.end)}`}/>:<>
+    <div className={styles.tabs} role="group" aria-label="Learning report sections"><button type="button" aria-pressed={section==='overview'} onClick={()=>setSection('overview')}>Overview</button><button type="button" aria-pressed={section==='subjects'} onClick={()=>setSection('subjects')}>Subject Progress</button><button type="button" aria-pressed={section==='consistency'} onClick={()=>setSection('consistency')}>Study Consistency</button></div>
+    {section==='consistency'?<StudyConsistencyReport key={`${range.start}:${range.end}`} start={range.start} end={range.end} empty={empty}/>:section==='subjects'?<SubjectProgressReport empty={empty} periodLabel={`${format(range.start)} – ${format(range.end)}`}/>:<>
     <p className={styles.note}>Figures will appear here once recorded activity is connected. A dash means unavailable, not zero.</p>
     <div className={styles.metrics}>{METRICS.map(label=><article key={label}><h3>{label}</h3><strong aria-label={`${label}: unavailable`}>—</strong><span>{empty?'No activity in this preview':'Awaiting recorded activity'}</span></article>)}</div>
     {empty && <div className={styles.empty} role="status"><h3>No activity to display</h3><p>This is the empty-state preview for the selected period.</p><Link href="/dashboard?view=weekly">Open Weekly Plan →</Link></div>}
