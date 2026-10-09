@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type { Paper, Profile } from '@/lib/types';
+import { WeeklyReview } from './WeeklyReview';
 import { PlanAdjustments } from './PlanAdjustments';
 import { DailySchedule } from './DailySchedule';
 import { WeeklyOverview } from './WeeklyOverview';
@@ -14,7 +15,7 @@ import { capacity, DAYS, parseDraft, propose, type PlanDraft, type ProposedSessi
 import styles from './WeeklyPlan.module.css';
 import { emptyAccount, loadPlanAccount, savePlanAccount, parseActive, type ActivePlan, type PlanAccount } from '@/lib/weekly-plan-storage';
 
-const TABS = [['overview','Overview'],['daily','Daily Schedule'],['adjustments','Plan Adjustments'],['this-week','This Week'],['next-week','Next Week'],['calendar','Calendar'],['lectures','Lectures'],['setup','Plan Setup']] as const;
+const TABS = [['overview','Overview'],['daily','Daily Schedule'],['adjustments','Plan Adjustments'],['review','Weekly Review'],['this-week','This Week'],['next-week','Next Week'],['calendar','Calendar'],['lectures','Lectures'],['setup','Plan Setup']] as const;
 function dateInZone(zone: string) { return new Intl.DateTimeFormat('en-CA',{timeZone:zone,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()); }
 function addDays(date: string, count: number) { const d = new Date(`${date}T12:00:00Z`); d.setUTCDate(d.getUTCDate()+count); return d.toISOString().slice(0,10); }
 function monday(date: string) { return addDays(date,-((new Date(`${date}T12:00:00Z`).getUTCDay()+6)%7)); }
@@ -100,11 +101,11 @@ function WeeklyPlanContent({student,papers,preview}: {student:Profile;papers:Pap
   if(!ready)return error ? <div role="alert"><p>{error}</p><button onClick={()=>setRetry(n=>n+1)}>Retry loading plan</button></div> : <p role="status">Loading Weekly Plan…</p>;
   return <section className={styles.page} aria-label="Weekly Plan">
     <header className={styles.header}><div><span className={styles.eyebrow}>YOUR STUDY ROUTINE</span><h2>Weekly Plan</h2><p>A clear place for the preparation ahead.</p></div><span className={styles.badge}>{student.level}</span></header>
-    {tab!=='overview' && tab!=='daily' && tab!=='adjustments' && <p className={styles.notice}>{preview ? 'Preview · Plans are saved on this browser only.' : 'Save your draft or reviewed timetable to your account and return on another device.'} Start a planned session below to record your study time.</p>}
+    {tab!=='overview' && tab!=='daily' && tab!=='adjustments' && tab!=='review' && <p className={styles.notice}>{preview ? 'Preview · Plans are saved on this browser only.' : 'Save your draft or reviewed timetable to your account and return on another device.'} Start a planned session below to record your study time.</p>}
     <nav className={styles.tabs} aria-label="Weekly Plan sections">{TABS.map(([id,label])=><Link key={id} href={href(id)} aria-current={tab===id?'page':undefined} onClick={()=>{setOpened(null);setFilter('all');}}>{label}</Link>)}</nav>
     {error && <p role="alert" className={styles.notice}>{error}</p>}
     {legacy && <div className={styles.notice}><p>A previous plan was found on this browser. You can copy it to your account. Your browser copy will be kept.</p><button disabled={importing} onClick={importLegacy}>{importing?'Importing…':'Import browser plan'}</button></div>}
-    {tab==='overview'?<WeeklyOverview/>:tab==='daily'?<DailySchedule/>:tab==='adjustments'?<PlanAdjustments/>:tab==='setup'?<PlanSetup key={legacy?'legacy':'account'} student={student} papers={papers} preview={preview} initialDraft={account.draft || plan?.draft || undefined} onSaveDraft={draft=>persist(draft,plan)} onReviewed={activate}/>:!plan?<div className={styles.empty}><h3>Start with a week that fits your life.</h3><p>Choose your study windows and review your plan. Your sessions will then appear here.</p><Link className={styles.primary} href={href('setup')}>Set up my plan →</Link></div>:<>
+    {tab==='overview'?<WeeklyOverview/>:tab==='daily'?<DailySchedule/>:tab==='adjustments'?<PlanAdjustments/>:tab==='review'?<WeeklyReview/>:tab==='setup'?<PlanSetup key={legacy?'legacy':'account'} student={student} papers={papers} preview={preview} initialDraft={account.draft || plan?.draft || undefined} onSaveDraft={draft=>persist(draft,plan)} onReviewed={activate}/>:!plan?<div className={styles.empty}><h3>Start with a week that fits your life.</h3><p>Choose your study windows and review your plan. Your sessions will then appear here.</p><Link className={styles.primary} href={href('setup')}>Set up my plan →</Link></div>:<>
     {removed.length>0 && <p className={styles.notice}>Some subjects have been removed from your profile. Their blocks are hidden; review Plan Setup to redistribute that time.</p>}
     {tab==='lectures'?<><div className={styles.sectionHead}><div><h3>Your lecture timetable</h3><p>Recurring lecture windows · {plan.draft.timezone}</p></div><Link href={href('setup')}>Edit lecture times →</Link></div>{plan.draft.mode==='self'?<div className={styles.empty}><h3>You selected self study</h3><p>If you attend classes, switch to lecture based or hybrid study in Plan Setup.</p></div>:!plan.draft.lectures.length?<div className={styles.empty}><h3>No lecture times added yet</h3><p>Add your class times in Plan Setup so independent study will not overlap them.</p></div>:<div className={styles.days}>{plan.draft.lectures.map((l,i)=><article className={styles.day} key={i}><h4>{DAYS[l.day]}</h4><p>{l.start}–{l.end}</p><span className={styles.badge}>Reserved lecture time</span></article>)}</div>}<div className={styles.pending}><h4>Still to connect</h4><p>Lecture subjects, attendance, post-lecture checks and missed-lecture catch-up will be added in the lecture workflow stage.</p></div></>:<>
     <div className={styles.sectionHead}><div><h3>{tab==='next-week'?'Looking ahead':tab==='calendar'?'Your study calendar':'This week at a glance'}</h3><p>{labelDate(week)} – {labelDate(addDays(week,6))} · {plan.draft.timezone}</p></div><Link href={href('setup')}>Adjust plan →</Link></div>
