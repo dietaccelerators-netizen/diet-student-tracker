@@ -1,4 +1,5 @@
 "use client";
+import { PortalIcon } from './PortalIcon';
 import { useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -18,6 +19,7 @@ export function TopicLessonLayout({subject,topic,backHref,subjectId,topicId,chil
  if(pathname==='/login'){practiceParams.set('mode','preview');practiceParams.set('stage',params.get('stage')||'Professional');}
  const practiceHref=(pathname==='/login'?'/login':'/dashboard')+'?'+practiceParams.toString();
  const [completed,setCompleted]=useState<number[]>([]);
+ const [notesOpen,setNotesOpen]=useState(false),[notes,setNotes]=useState('');
  const [notice,setNotice]=useState('');
  const chooseSection=(index:number)=>{setSection(index);setPanel(0);setNotice('');};
  const content=panels[panel];
@@ -25,12 +27,14 @@ export function TopicLessonLayout({subject,topic,backHref,subjectId,topicId,chil
   <Link className={styles.back} href={backHref}>← Back to {subject}</Link>
   <header className={styles.header}><div><span className={styles.eyebrow}>{subject} · LESSON WORKSPACE</span><h1>{topic}</h1><p>Read, work through examples and review each section.</p></div><span className={styles.badge}>Layout preview</span></header>
   <div className={styles.preview}><strong>Structure preview only</strong><p>Section titles and content areas are placeholders. Completion changes below are temporary and do not update your learning report or saved study record.</p></div>
+  <nav className="mv-actions" aria-label="Lesson shortcuts"><a className="mv-button" href="#lesson-reading"><PortalIcon name="subjects"/>Continue learning</a><button className="mv-button mv-button-outline" aria-expanded={notesOpen} aria-controls="lesson-quick-notes" onClick={()=>setNotesOpen(v=>!v)}><PortalIcon name="notes"/>Notes</button><Link className="mv-button mv-button-outline" href={pathname==='/login'?`/login?mode=preview&stage=${encodeURIComponent(params.get('stage')||'Professional')}&view=resources`:'/dashboard?view=resources'}><PortalIcon name="resources"/>Resources</Link><Link className="mv-button mv-button-outline" href={practiceHref}><PortalIcon name="practice"/>Practise this topic</Link></nav>
+  {notesOpen&&<section className="mv-notes" id="lesson-quick-notes"><label htmlFor="lesson-note">Quick notes</label><p>Temporary scratchpad. Copy your notes before leaving this page; they are not saved to your account.</p><textarea id="lesson-note" value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Write a reminder or a point to revisit…" rows={5}/></section>}
   <div className={styles.layout}>
    <aside className={styles.outline}><h2>In this topic</h2><p>{completed.length} of {sections.length} sample sections marked complete</p><progress aria-label="Temporary sample completion" value={completed.length} max={sections.length}/><nav aria-label="Topic section navigation">{sections.map((name,i)=><button type="button" key={name} aria-current={section===i?'step':undefined} onClick={()=>chooseSection(i)}><span className={styles.step}>{completed.includes(i)?'✓':String(i+1).padStart(2,'0')}</span><span>{name}<small>{completed.includes(i)?'Complete in preview':section===i?'Current section':'Not started in preview'}</small></span></button>)}</nav><button className={styles.reset} type="button" onClick={()=>{setCompleted([]);chooseSection(0);setNotice('The layout preview has been reset.');}}>Reset preview</button></aside>
    <div className={styles.main}>
     <div className={styles.sectionHeader}><span className={styles.eyebrow}>SECTION {section+1} OF {sections.length}</span><h2>{sections[section]}</h2><p>Study time will appear when the lesson content is added.</p></div>
     <nav className={styles.tabs} aria-label="Learning content">{panels.map((item,i)=><button type="button" key={item.title} aria-pressed={panel===i} onClick={()=>setPanel(i)}>{item.title}</button>)}</nav>
-    <section className={styles.reading} aria-label={content.title}><span className={styles.label}>CONTENT PLACEHOLDER</span><h3>{content.heading}</h3><p>{content.description}</p><div className={styles.slots}>{content.slots.map((title,i)=><div key={title}><span>{String(i+1).padStart(2,'0')}</span><div><h4>{title}</h4><p>Reserved for approved lesson content.</p></div></div>)}</div></section>
+    <section id="lesson-reading" className={styles.reading} aria-label={content.title}><span className={styles.label}>CONTENT PLACEHOLDER</span><h3>{content.heading}</h3><p>{content.description}</p><div className={styles.slots}>{content.slots.map((title,i)=><div key={title}><span>{String(i+1).padStart(2,'0')}</span><div><h4>{title}</h4><p>Reserved for approved lesson content.</p></div></div>)}</div></section>
     <div className={styles.controls}><button type="button" disabled={section===0} onClick={()=>chooseSection(section-1)}>← Previous section</button><button type="button" className={styles.primary} onClick={()=>{const done=completed.includes(section);setCompleted(done?completed.filter(n=>n!==section):[...completed,section]);setNotice(done?'Section unmarked in this preview.':'Section marked complete in this preview only.');}}>{completed.includes(section)?'Undo completion':'Mark complete'} <span>(preview)</span></button><button type="button" disabled={section===sections.length-1} onClick={()=>chooseSection(section+1)}>Next section →</button></div>
     <p className={styles.notice} role="status">{notice||'Completion here demonstrates the interaction only.'}</p>
     <section className={styles.practice}><div><h3>Test my understanding</h3><p>Open Practice Room with this subject, topic and section selected.</p></div><Link className={styles.practiceLink} href={practiceHref}>Open Practice Room →</Link></section>

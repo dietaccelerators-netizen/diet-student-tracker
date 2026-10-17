@@ -1,4 +1,5 @@
 "use client";
+import { PortalIcon } from './PortalIcon';
 
 import { useEffect, useMemo, useState } from "react";
 import { stagePapers } from "@/lib/stages";
@@ -59,10 +60,10 @@ export function ManagePapers({ studentId, adminMode = false }: { studentId: stri
       <button
         type="button"
         onClick={() => { setSelected(studentPaperIds); setOpen((value) => !value); setSaved(false); setError(null); }}
-        className="secondary-action focus-ring min-h-11 rounded-md border border-[#C9D2CC] bg-white px-4 text-sm font-semibold text-[#365B46] hover:border-[#365B46]"
+        className="mv-button mv-button-outline"
         aria-expanded={open}
       >
-        {adminMode ? "Edit papers" : studentPaperIds.length === 0 ? "Choose my papers" : "Manage papers"}
+        <PortalIcon name="subjects"/> {adminMode ? "Edit papers" : studentPaperIds.length === 0 ? "Choose my papers" : "Manage papers"}
       </button>
 
       {saved && !open && (

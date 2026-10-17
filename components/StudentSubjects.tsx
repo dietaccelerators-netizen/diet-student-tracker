@@ -1,4 +1,5 @@
 "use client";
+import { PortalArtwork, subjectIcon } from './PortalArtwork';
 import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
 import type { TrackerState } from '@/lib/types';
@@ -33,7 +34,7 @@ export function StudentSubjects({state,studentId,preview=false,managePapers}:{st
   <section id="subject-catalogue" aria-label="Registered subjects"><div className={styles.toolbar}><label className={styles.search}><span>Search your subjects</span><input type="search" placeholder="Subject name, code or topic" value={query} onChange={e=>setQuery(e.target.value)}/></label><div className={styles.manage}><span>{papers.length} registered {papers.length===1?'subject':'subjects'}</span>{managePapers}</div></div>
   {query&&<p className={styles.results} role="status">{filtered.length} {filtered.length===1?'subject':'subjects'} found <button onClick={()=>setQuery('')}>Clear search</button></p>}
   <div className={styles.grid}>{filtered.map(({paper,topics,current,next,record})=><article className={styles.card} key={paper.id}>
-   <div className={styles.imageSlot} aria-label={`Image placeholder for ${paper.name}`}><span className={styles.imageMark} aria-hidden="true">{paper.code}</span><small>SUBJECT IMAGE</small></div>
+   <div className={styles.imageSlot}><PortalArtwork kind={subjectIcon(paper.name)} compact/><span className="mv-art-code">{paper.code}</span></div>
    <div className={styles.cardBody}><span className={styles.code}>{paper.code}</span><h2>{paper.name}</h2><div className={styles.coverage}><span>Syllabus coverage</span><strong>Not yet measured</strong></div><div className={styles.progressPlaceholder} aria-hidden="true"/><p className={styles.hint}>Section completion tracking will appear here.</p>
    <dl><div><dt>{record?'Current topic':current?'Start with':'Current topic'}</dt><dd>{current?.topicName||'Topic list awaiting publication'}</dd></div><div><dt>Next topic</dt><dd>{next?.topicName||(topics.length?'End of the current topic list':'Available when topics are published')}</dd></div></dl>
    <Link className={styles.continue} href={subjectHref(paper.id)} aria-label={`${current?'Continue':'Open'} ${paper.name}`}>{current?'Continue':'Open subject'} <span aria-hidden="true">→</span></Link></div>
