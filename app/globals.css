@@ -748,3 +748,10 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 
 /* A quieter home: one shortcut per destination, with contextual study progress. */
 .mv-explore-strip{display:flex;align-items:center;gap:16px;padding:20px 24px;margin:0 0 28px;background:#fff;border:1px solid #d8e5f5;border-radius:16px}.da-home .mv-explore-strip h2{font-size:17px;line-height:1.4;margin:0 0 4px;color:#08245c}.mv-explore-strip p{font-size:13px;line-height:1.6;color:#526781;margin:0}.mv-explore-strip .mv-button{margin-left:auto;flex-shrink:0}.mv-subject-count{font-size:12px;color:#63748b}.da-home .mv-home-progress{grid-template-columns:repeat(auto-fit,minmax(min(100%,350px),1fr))}.da-home .da-subjects{margin-top:28px}@media(max-width:600px){.mv-explore-strip{flex-wrap:wrap;padding:18px;gap:12px}.mv-explore-strip>div{flex:1;min-width:180px}.mv-explore-strip .mv-button{width:100%;margin:4px 0 0}.mv-subject-count{font-size:11px}}
+
+/* Home uses the same illustration family as subjects and practice. */
+.da-subject-art{height:112px;overflow:hidden}
+.da-subject-art .mv-artwork{transform:scale(.68);transform-origin:center;align-self:center;margin-top:-19px;margin-bottom:-19px}
+.da-hero-art{display:grid;place-items:center;background:transparent;padding:0;min-width:0}
+.da-hero-art .mv-artwork{max-width:none}
+@media(max-width:760px){.da-hero-art .mv-artwork{transform:scale(.65);margin:-26px -32px}}
