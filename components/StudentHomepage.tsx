@@ -1,35 +1,74 @@
-"use client";
-import { PortalIcon } from './PortalIcon';
+'use client';
 import Link from 'next/link';
-import { HomeBanner } from './HomeBanner';
+import { useEffect, useState } from 'react';
+import { PortalIcon } from './PortalIcon';
 import { PortalArtwork, subjectIcon } from './PortalArtwork';
-import { useState } from 'react';
 import type { TrackerState } from '@/lib/types';
 import { getStudent, getStudentPapers, getStudentProgress } from '@/lib/selectors';
 import { stageFor } from '@/lib/stages';
+import { loadPlanAccount, parseActive, type ActivePlan } from '@/lib/weekly-plan-storage';
+import { propose } from '@/lib/plan-setup';
+import { loadSessions, blockKey, type StudySession } from '@/lib/study-sessions';
+import styles from './StudentHomepage.module.css';
 
-export function StudentHomepage({state,studentId,preview=false}:{state:TrackerState;studentId:string;preview?:boolean}) {
- const [search,setSearch]=useState('');
- const student=getStudent(state,studentId); if(!student)return <p>Your profile could not be loaded.</p>;
- const papers=getStudentPapers(state,studentId), progress=getStudentProgress(state,studentId);
- const recent=[...progress].filter(p=>p.status!=='Not Started'||p.lastStudied).sort((a,b)=>(b.lastStudied??b.updatedAt).localeCompare(a.lastStudied??a.updatedAt))[0];
- const recentTopic=recent?state.topics.find(t=>t.id===recent.topicId):undefined;
- const recentPaper=recentTopic?papers.find(p=>p.id===recentTopic.paperId):undefined;
- const weekly=progress.filter(p=>p.thisWeek), completed=weekly.filter(p=>p.status==='Okay').length;
+const addDays=(date:string,n:number)=>{const d=new Date(`${date}T12:00:00Z`);d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);};
+const dateInZone=(zone:string)=>new Intl.DateTimeFormat('en-CA',{timeZone:zone,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+const banners=[
+ {label:'ONE STEP AT A TIME',title:'Build knowledge today. Grow your confidence for exam day.',text:'Pick up your learning and make a little room for progress.',action:'Keep learning',view:'subjects',icon:'subjects'},
+ {label:'PRACTISE WITH PURPOSE',title:'Make what you learn easier to recall.',text:'Try the sample questions in your Practice room.',action:'Open Practice room',view:'practice',icon:'practice'},
+ {label:'YOUR STUDY LIBRARY',title:'Keep the right resources within reach.',text:'Find official study texts and examination materials for your stage.',action:'Browse resources',view:'resources',icon:'resources'}
+];
+export function StudentHomepage({state,studentId,preview=false}:{state:TrackerState;studentId:string;preview?:boolean}){
+ const student=getStudent(state,studentId);
+ const [search,setSearch]=useState(''),[banner,setBanner]=useState(0),[notices,setNotices]=useState(false);
+ const [data,setData]=useState<{plan:ActivePlan|null;examDate:string;today:string;rows:StudySession[];ready:boolean;error:string}>({plan:null,examDate:'',today:'',rows:[],ready:false,error:''});
+ const [retry,setRetry]=useState(0);
+ useEffect(()=>{
+  if(!student)return;
+  let cancelled=false;
+  async function load(){try{
+   const account=preview?null:await loadPlanAccount(studentId,student!.level);
+   const raw=preview?localStorage.getItem(`diet:weekly-plan:v1:preview:${studentId}:${student!.level}`):null;
+   const plan=preview?(raw?parseActive(JSON.parse(raw)):null):account?.active??null;
+   const today=dateInZone(plan?.draft.timezone||'Africa/Lagos');
+   const week=addDays(today,-((new Date(`${today}T12:00:00Z`).getUTCDay()+6)%7));
+   const rows=await loadSessions(studentId,student!.level,week,addDays(week,6),preview);
+   if(!cancelled)setData({plan,examDate:plan?.draft.examDate||account?.draft?.examDate||'',today,rows,ready:true,error:''});
+  }catch{if(!cancelled)setData(d=>({...d,ready:true,error:'Your plan could not be loaded. Please try again.'}));}}
+  void load();const timer=setInterval(()=>void load(),60000);
+  return()=>{cancelled=true;clearInterval(timer);};
+ },[studentId,student?.level,preview,retry]);
+ if(!student)return <p>Your profile could not be loaded.</p>;
+ const papers=getStudentPapers(state,studentId),progress=getStudentProgress(state,studentId);
  const stage=stageFor(student.level)??student.level;
- const base=`/login?mode=preview&stage=${encodeURIComponent(stage)}`;
- const href=(url:string)=>{if(!preview||url.startsWith('#'))return url;if(url.startsWith('/papers/')){const [id,query]=url.slice(8).split('?');return `${base}&subject=${encodeURIComponent(id)}${query?'&'+query:''}`;}if(url==='/dashboard?view=profile')return '/login';if(url.startsWith('/dashboard?view='))return `${base}&view=${encodeURIComponent(url.split('view=')[1])}`;return '/login';};
- const percentFor=(id:string)=>{const ids=new Set(state.topics.filter(t=>t.paperId===id).map(t=>t.id));return ids.size?Math.round(progress.filter(p=>ids.has(p.topicId)&&p.status==='Okay').length/ids.size*100):0;};
- const resume=recentPaper&&recentTopic?`/papers/${recentPaper.id}?lesson=${encodeURIComponent(recentTopic.id)}`:'#da-subjects';
- const filtered=papers.filter(p=>`${p.name} ${p.code}`.toLowerCase().includes(search.trim().toLowerCase()));
- return <div className="learning-home da-home">
-  <header className="da-welcome"><div><h1>Welcome back, {student.fullName.split(' ')[0]}</h1><p><strong>{stage}</strong><span/>{stage.startsWith('ATS')?'ATSWA':'ICAN'} Student</p></div><div className="da-header-actions"><label className="da-search"><span aria-hidden="true">⌕</span><input type="search" placeholder="Search your subjects…" aria-label="Search your subjects" value={search} onChange={e=>setSearch(e.target.value)}/></label><Link className="da-account" href={href('/dashboard?view=profile')} aria-label="Open my profile"><span>{student.fullName.charAt(0)}</span><b>{student.fullName.split(' ')[0]}</b></Link></div></header>
-  <HomeBanner />
-  <nav className="mv-shortcuts" aria-label="Quick study shortcuts">{[['subjects','My subjects','Pick up your learning'],['weekly','Weekly plan','Make room for progress'],['practice','Quick practice','Try the sample questions']].map(([icon,title,description])=><Link key={icon} href={href(`/dashboard?view=${icon}`)} className="mv-shortcut"><span className="mv-icon"><PortalIcon name={icon}/></span><span><strong>{title}</strong><small>{description}</small></span><span className="mv-arrow" aria-hidden="true">↗</span></Link>)}</nav>
-  <section className="mv-explore-strip" aria-label="Explore Mastrevo"><span className="mv-icon"><PortalIcon name="resources"/></span><div><h2>Explore Mastrevo</h2><p>Study texts and exam resources for your stage.</p></div><Link className="mv-button mv-button-outline" href={href('/dashboard?view=resources')}>Browse resources <span aria-hidden="true">→</span></Link></section>
-  {(recentPaper||weekly.length>0)&&<div className="da-top-grid mv-home-progress">{recentPaper&&<section className="da-resume"><div className="da-resume-copy"><p className="da-eyebrow">{recentPaper?'Continue learning':'Your learning journey'}</p><h2>{recentTopic?.topicName??'Your next chapter starts here.'}</h2><p className="da-description">{recentPaper?`${stage} · ${recentPaper.name}`:'Choose a subject and take your first step.'}</p>{recentPaper&&<div className="da-progress-line"><progress max={100} value={percentFor(recentPaper.id)} aria-label="Subject confidence"/><span>{percentFor(recentPaper.id)}% confident</span></div>}<Link className="da-primary" href={href(resume)}><span aria-hidden="true">▷</span>{recentPaper?'Continue learning':'Explore my subjects'}<span aria-hidden="true">→</span></Link></div><div className="da-hero-art"><PortalArtwork kind="subjects" compact/></div></section>}
-  {weekly.length>0&&<section className="da-week" id="da-week"><p className="da-eyebrow">This week</p><h2>Weekly study plan</h2><div className="da-week-content"><div>{weekly.length?<ul>{weekly.slice(0,4).map(p=>{const t=state.topics.find(t=>t.id===p.topicId);return <li key={p.id}><span className={`da-check ${p.status==='Okay'?'is-done':''}`} aria-label={p.status==='Okay'?'Confident':'In progress'}>{p.status==='Okay'?'✓':''}</span><Link href={href(t?`/papers/${t.paperId}?lesson=${encodeURIComponent(t.id)}`:'/dashboard?view=weekly')}>{t?.topicName??'Study topic'}</Link></li>;})}</ul>:<p className="da-week-empty">Make room for a few priorities.<br/>Choose the topics you want to focus on this week.</p>}<Link className="da-text-link" href={preview&&!weekly.length?'#da-subjects':href('/dashboard?view=weekly')}>{weekly.length?'Review weekly plan':'Choose your topics'} <span aria-hidden="true">→</span></Link></div><div className="da-week-summary"><div className="da-ring" style={{background:`conic-gradient(#0759e6 ${weekly.length?completed/weekly.length*100:0}%, #dceaff 0)`}}><strong>{completed}/{weekly.length}</strong></div><b>Weekly goals</b><small>{weekly.length?`${completed} topics confident`:'Ready when you are'}</small></div></div></section>}</div>}
-
-  <section id="da-subjects" className="da-subjects"><div className="da-section-title"><h2>My subjects</h2><span className="mv-subject-count">{papers.length} registered {papers.length===1?'subject':'subjects'}</span></div><div className="da-subject-grid">{filtered.map((paper,i)=>{const percent=percentFor(paper.id);return <Link className={`da-subject da-tone-${i%4}`} key={paper.id} href={href(`/papers/${paper.id}`)}><div className="da-subject-art"><PortalArtwork kind={subjectIcon(paper.name)} compact/></div><h3>{paper.name}</h3><p>{stage}</p><div className="da-progress-line"><progress max={100} value={percent} aria-label={`${paper.name}: topics confident`}/><span>{percent}%</span></div><span className="da-subject-open">Open subject <span aria-hidden="true">→</span></span></Link>;})}</div>{!filtered.length&&<p className="da-empty">{papers.length?'No matching subjects. Try another name or code.':'Your subjects will appear once you choose your papers.'}</p>}<p className="da-footnote">Progress reflects the topics you have marked confident.</p></section>
+ const href=(url:string)=>{if(!preview)return url;const base=`/login?mode=preview&stage=${encodeURIComponent(stage)}`;if(url.startsWith('/papers/')){const [id,q]=url.slice(8).split('?');return `${base}&subject=${encodeURIComponent(id)}${q?'&'+q:''}`;}return url.replace('/dashboard?',`${base}&`);};
+ const weekly=href('/dashboard?view=weekly&plan=this-week');
+ const validProgress=progress.filter(p=>state.topics.some(t=>t.id===p.topicId&&papers.some(paper=>paper.id===t.paperId)));
+ const recent=[...validProgress].filter(p=>p.lastStudied||p.status!=='Not Started').sort((a,b)=>(b.lastStudied||b.updatedAt).localeCompare(a.lastStudied||a.updatedAt))[0];
+ const topic=state.topics.find(t=>t.id===recent?.topicId),paper=papers.find(p=>p.id===topic?.paperId);
+ const resume=paper&&topic?href(`/papers/${paper.id}?lesson=${encodeURIComponent(topic.id)}`):href('/dashboard?view=subjects');
+ const weak=[...validProgress].filter(p=>p.status==='Needs Practice'||p.questionPractice==='Reattempt').sort((a,b)=>Number(b.questionPractice==='Reattempt')-Number(a.questionPractice==='Reattempt')||a.updatedAt.localeCompare(b.updatedAt))[0];
+ const weakTopic=state.topics.find(t=>t.id===weak?.topicId);
+ const day=data.today?(new Date(`${data.today}T12:00:00Z`).getUTCDay()+6)%7:0;
+ const week=data.today?addDays(data.today,-day):'';
+ const blocks=data.plan?propose(data.plan.draft,data.plan.paperIds).filter(s=>papers.some(p=>p.id===s.paperId)).map(s=>({...s,date:addDays(week,s.day)})):[];
+ const completed=(s:typeof blocks[number])=>data.rows.some(r=>r.block_key===blockKey(s)&&r.status==='completed');
+ const todayBlocks=blocks.filter(s=>s.date===data.today);
+ const done=blocks.filter(completed).length;
+ const behind=blocks.some(s=>s.date<data.today&&!completed(s));
+ const days=data.examDate&&data.today?Math.ceil((Date.parse(`${data.examDate}T00:00:00Z`)-Date.parse(`${data.today}T00:00:00Z`))/86400000):null;
+ const current=banners[banner];
+ const query=search.trim().toLowerCase();
+ const matches=query?[...papers.filter(p=>`${p.name} ${p.code}`.toLowerCase().includes(query)).map(p=>({id:p.id,title:p.name,url:`/papers/${p.id}`})),...state.topics.filter(t=>papers.some(p=>p.id===t.paperId)&&t.topicName.toLowerCase().includes(query)).map(t=>({id:t.id,title:t.topicName,url:`/papers/${t.paperId}?lesson=${encodeURIComponent(t.id)}`}))].slice(0,6):[];
+ return <div className={`da-home ${styles.home}`}>
+  <div className={styles.topbar}><div className={styles.search}><label><PortalIcon name="search"/><input aria-label="Search subjects and topics" placeholder="Search subjects and topics…" value={search} onChange={e=>setSearch(e.target.value)}/></label>{query&&<div className={styles.results}>{matches.length?matches.map(m=><Link key={m.id} href={href(m.url)}>{m.title}<span>→</span></Link>):<p>No matching subjects or topics.</p>}</div>}</div><div className={styles.notifications}><button aria-label="Notifications" aria-expanded={notices} onClick={()=>setNotices(!notices)}><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 6-3 6-3 9h18c0-3-3-3-3-9M10 21h4"/></svg></button>{notices&&<div className={styles.notice}><strong>Notifications</strong><p>Personal notifications are not available yet. Study reminders appear below.</p></div>}</div><Link className={styles.profile} href={href('/dashboard?view=profile')}><span>{student.fullName.charAt(0)}</span><b>{student.fullName.split(' ')[0]}</b></Link></div>
+  <div className={styles.layout}>
+   <header className={styles.welcome}><small>WELCOME BACK</small><h1>{student.fullName.split(' ')[0]}</h1><p>Stay consistent, keep learning and make progress towards your exam goals.</p><span>{stage} · {data.today?new Intl.DateTimeFormat('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(`${data.today}T12:00:00Z`)):'Your study workspace'}</span></header>
+   <section className={`${styles.card} ${styles.exam}`} aria-label="Exam countdown"><span className={styles.roundIcon}><PortalIcon name="weekly"/></span><div><small>YOUR NEXT EXAM</small><strong>{!data.ready?'…':days===null?'—':days<0?'Date passed':days===0?'Today':days}</strong><h2>{days!==null&&days>0?'days to exam':'Exam countdown'}</h2><p>{student.examDiet||'Exam diet not set'}</p>{data.examDate?<small>{data.examDate} · Your saved plan date</small>:<Link href={href('/dashboard?view=weekly&plan=setup')}>Set your exam date →</Link>}</div></section>
+   <section className={styles.banner} aria-label="Study reminders" aria-roledescription="carousel"><div className={styles.bannerCopy} role="group" aria-label={`${banner+1} of 3`}><small>{current.label}</small><h2>{current.title}</h2><p>{current.text}</p><Link className={styles.primary} href={banner===0?resume:href(`/dashboard?view=${current.view}`)}>{current.action} <span>→</span></Link></div><div className={styles.bannerArt}><PortalArtwork kind={current.icon}/></div><div className={styles.controls}><button aria-label="Previous reminder" onClick={()=>setBanner((banner+2)%3)}>←</button><div>{banners.map((b,i)=><button key={b.view} aria-label={`Show reminder ${i+1}`} aria-pressed={banner===i} onClick={()=>setBanner(i)}><span/></button>)}</div><button aria-label="Next reminder" onClick={()=>setBanner((banner+1)%3)}>→</button></div></section>
+   <div className={styles.studyCards}><section className={styles.card}><h2>Continue Learning</h2><p>Pick up where you left off.</p><div className={styles.continueContent}><PortalArtwork kind={paper?subjectIcon(paper.name):'subjects'} compact/><div><small>{paper?.name||'Your learning journey'}</small><h3>{topic?.topicName||'Your next chapter starts here.'}</h3><p>{recent?.nextStep||'Choose a subject and take one focused step.'}</p>{recent?.lastStudied&&<small>Last studied {recent.lastStudied}</small>}</div></div><Link className={styles.primary} href={resume}>{topic?'Continue learning':'Choose a subject'} <span>→</span></Link></section>
+   <section className={styles.card}><h2><PortalIcon name="weekly"/> Today’s Plan</h2><p>{!data.ready?'Loading your plan…':data.error?'Your schedule is temporarily unavailable.':todayBlocks.length?`${todayBlocks.filter(s=>!completed(s)).length} sessions remaining today`:'Make room for a little progress.'}</p>{!data.error&&data.ready&&<>{todayBlocks.length?<ul className={styles.sessions}>{todayBlocks.map(s=><li key={blockKey(s)}><div><b>{s.start}</b><small>{s.duration} min</small></div><div><strong>{papers.find(p=>p.id===s.paperId)?.name}</strong><small>Scheduled study</small></div>{completed(s)?<span aria-label="Completed"><PortalIcon name="check"/></span>:<Link href={weekly}>Open →</Link>}</li>)}</ul>:<div className={styles.empty}><span className={styles.roundIcon}><PortalIcon name="weekly"/></span><h3>{data.plan?'No sessions planned today':'Build your study routine'}</h3><p>{data.plan?'A little extra revision is always an option.':'Set your available days in Weekly plan. Your sessions for today will appear here.'}</p></div>}<Link className={styles.secondary} href={data.plan?weekly:href('/dashboard?view=weekly&plan=setup')}>{data.plan?'Open weekly plan':'Set up my plan'} →</Link></>}{data.error&&<button className={styles.secondary} onClick={()=>setRetry(n=>n+1)}>Try again</button>}</section></div>
+   <aside className={styles.side}><section className={styles.card}><span className={styles.roundIcon}><PortalIcon name="target"/></span><h2>{data.error?'Status unavailable':!data.ready?'Loading your week…':!blocks.length?'A fresh start':behind?'A little adjustment needed':'You’re on track'}</h2><p>{data.error?data.error:blocks.length?`You’ve completed ${done} of ${blocks.length} planned sessions this week.`:'Your weekly progress will appear once a study plan is active.'}</p>{blocks.length>0&&!data.error&&<progress max={blocks.length} value={done} aria-label="This week’s completed sessions"/>}{behind&&!data.error&&<Link className={styles.textLink} href={weekly}>Review your week →</Link>}</section><section className={styles.card}><div className={styles.attention}><PortalIcon name="target"/><small>NEEDS ATTENTION</small></div><h2>{weakTopic?.topicName||'Room to strengthen'}</h2><p>{weakTopic?(weak?.questionPractice==='Reattempt'?'You marked this topic for another practice attempt.':'You marked this topic as needing more practice.'):'Topics you mark for more practice will appear here, one at a time.'}</p>{weakTopic?<Link className={styles.primary} href={href(`/papers/${weakTopic.paperId}?lesson=${encodeURIComponent(weakTopic.id)}`)}>Review topic →</Link>:<small>No topic flagged yet</small>}</section></aside>
+  </div>
  </div>;
 }
