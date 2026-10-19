@@ -18,3 +18,27 @@
 
 /* Attached learning template, adapted to the shared Mastrevo design system. */
 .tabs{border-radius:var(--ui-card-radius) var(--ui-card-radius) 0 0}.reading{border-radius:0 0 var(--ui-card-radius) var(--ui-card-radius);border-color:var(--ui-card-border);min-height:280px}.reading h4{font-size:17px;font-weight:650;margin:26px 0 12px}.reading>p{max-width:76ch;margin:14px 0;line-height:1.85;color:#445b77}.readingToolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.readingToolbar p{font-size:13px;color:#6c809a;margin-top:5px}.readingModes{display:flex;background:#edf3fb;border-radius:12px;padding:4px;gap:4px}.readingModes button{min-height:40px;padding:9px 17px;border-radius:9px;font-size:13px;color:#60738e;cursor:pointer}.readingModes button[aria-pressed=true]{background:white;color:#0759e6;box-shadow:0 2px 5px #08245c12;font-weight:650}.reading .modeNote{background:#eef6ff;border-radius:10px;padding:12px 16px;font-size:13px}.lessonList{padding-left:24px;list-style:decimal;line-height:1.85;color:#445b77;margin:16px 0 24px}.lessonList li{padding-left:8px;margin:12px 0}.lessonList p{margin-top:5px}.example{border:1px solid var(--ui-card-border);border-radius:var(--ui-card-radius);padding:var(--ui-card-padding);margin-top:20px;line-height:1.85;color:#445b77}.example h4:first-child{margin-top:0}.completion{display:flex;align-items:center;justify-content:space-between;gap:20px;background:#edf7f3;border:1px solid #cce5d9;border-radius:var(--ui-card-radius);padding:var(--ui-card-padding);margin:24px 0 16px}.completion h3{font-size:18px;font-weight:650}.completion p{font-size:13px;color:#547266;line-height:1.7;margin:8px 0}.completion small{font-size:11px;color:#637c72}.header h1{max-width:750px}.outline nav button{width:100%;min-width:0}.outline nav button>span:last-child{min-width:0;overflow-wrap:anywhere}@media(max-width:760px){.completion{align-items:stretch;flex-direction:column}.outline nav{grid-template-columns:1fr}.reading{padding:20px}.tabs button{font-size:12px;padding:14px 12px}}
+
+/* Approved typography: subjects rollout. */
+.page.page{font-family:var(--font-source-sans),Arial,sans-serif;font-size:18px;line-height:27px;color:#08245c;--ui-button-font:17px;--ui-button-height:48px}
+.page.page :is(h1,h2,h3,h4){font-family:var(--font-space-grotesk),Arial,sans-serif;font-weight:600;letter-spacing:-.02em;color:#08245c}
+.page.page :is(button,input,select){font-family:var(--font-source-sans),Arial,sans-serif}
+.page.page :is(button,a){overflow-wrap:break-word}
+
+.page.page .header h1{font-size:30px;line-height:39px}
+.page.page .sectionHeader h2{font-size:25px;line-height:34px}
+.page.page :is(.reading h3,.reading h4,.outline h2,.practice h3,.handoff h3,.completion h3){font-size:22px;line-height:30px}
+.page.page :is(.reading>p,.lessonList,.example){font-size:20px;line-height:32px;color:#08245c}
+.page.page .reading{padding:32px;overflow-wrap:break-word}
+.page.page :is(.reading>p,.lessonList,.example){max-width:70ch}
+.page.page :is(.header p,.preview p,.practice p,.handoff p,.completion p){font-size:18px;line-height:27px;color:#08245c}
+.page.page :is(.back,.outline nav button,.tabs button,.readingModes button){font-size:16px;line-height:24px;font-weight:500}
+.page.page :is(.eyebrow,.badge,.preview strong,.label,.readingToolbar p,.reading .modeNote,.handoff dt,.handoff dd,.outline>p,.notice){font-size:15px;line-height:22px}
+.page.page :is(.outline small,.step,.sectionHeader p,.completion small){font-size:14px;line-height:20px}
+.page.page :is(.controls button,.practice button,.practiceLink,.reset){font-size:17px;line-height:24px;font-weight:600}
+.page.page.page :global(.mv-button.mv-button.mv-button){font-family:var(--font-source-sans),Arial,sans-serif;font-size:17px;line-height:24px;font-weight:600}
+.page.page .layout{grid-template-columns:260px minmax(0,1fr)}
+.page.page .tabs{flex-wrap:wrap;overflow:visible}.page.page .tabs button{flex:1 1 130px;white-space:normal;min-height:56px}
+.page.page .readingModes button{min-height:44px}.page.page .badge{white-space:normal}
+@media(max-width:1100px){.page.page .layout{grid-template-columns:1fr}.page.page .outline nav{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.page.page{--ui-button-font:16px}.page.page .header h1{font-size:26px;line-height:34px}.page.page .sectionHeader h2{font-size:23px;line-height:32px}.page.page :is(.reading h3,.reading h4,.outline h2,.practice h3,.handoff h3,.completion h3){font-size:21px;line-height:29px}.page.page :is(.reading>p,.lessonList,.example){font-size:19px;line-height:30px}.page.page :is(.header p,.preview p,.practice p,.handoff p,.completion p){font-size:17px;line-height:26px}.page.page :is(.controls button,.practice button,.practiceLink,.reset){font-size:16px}.page.page.page :global(.mv-button.mv-button.mv-button){font-size:16px}.page.page .reading{padding:20px}.page.page .outline nav{grid-template-columns:1fr}}

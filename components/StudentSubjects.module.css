@@ -13,3 +13,23 @@
 
 /* Continue Learning layout from the supplied subject template. */
 .imageSlot{height:125px}.imageSlot :global(.mv-artwork){transform:scale(.78)}.cardBody{padding:var(--ui-card-padding)}.resume.resume.resume{background:#eef6ff}.resume h2{font-size:18px;margin:6px 0}.resume small{margin-top:6px}.resume{margin-bottom:24px}.header h1{margin-top:0}.continue.continue.continue{background:white;color:var(--ui-primary);border-color:var(--ui-button-border)}.continue.continue.continue:hover{background:var(--ui-secondary-hover);color:var(--ui-primary)}
+
+/* Approved typography: subjects rollout. */
+.page.page{font-family:var(--font-source-sans),Arial,sans-serif;font-size:18px;line-height:27px;color:#08245c;--ui-button-font:17px;--ui-button-height:48px}
+.page.page :is(h1,h2,h3,h4){font-family:var(--font-space-grotesk),Arial,sans-serif;font-weight:600;letter-spacing:-.02em;color:#08245c}
+.page.page :is(button,input,select){font-family:var(--font-source-sans),Arial,sans-serif}
+.page.page :is(button,a){overflow-wrap:break-word}
+
+.page.page .header h1{font-size:32px;line-height:40px}
+.page.page :is(.header p,.resume p,.card dd,.empty p){font-size:18px;line-height:27px;color:#08245c}
+.page.page :is(.resume h2,.card h2,.empty h2){font-size:22px;line-height:30px;min-height:0}
+.page.page :is(.eyebrow,.search span,.manage,.coverage,.card dt,.results,.footnote){font-size:15px;line-height:22px}
+.page.page :is(.code,.resume small,.hint){font-size:14px;line-height:20px}
+.page.page .search input{font-size:16px;line-height:24px;min-height:48px}
+.page.page :is(.primary,.continue){font-size:17px;line-height:24px;font-weight:600}
+.page.page .coverage{flex-wrap:wrap}
+.page.page .card h2{margin-bottom:20px}
+.page.page .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.page.page .resume>div{min-width:0}.page.page .resume>a{flex-shrink:0}
+@media(min-width:1400px){.page.page .grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:620px){.page.page .grid{grid-template-columns:1fr}.page.page .header h1{font-size:26px;line-height:34px}.page.page :is(.resume h2,.card h2,.empty h2){font-size:21px;line-height:29px}.page.page :is(.header p,.resume p,.card dd,.empty p){font-size:17px;line-height:26px}.page.page :is(.primary,.continue){font-size:16px}}
