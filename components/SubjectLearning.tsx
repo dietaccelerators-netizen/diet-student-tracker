@@ -1,6 +1,5 @@
 "use client";
 import { PortalArtwork, subjectIcon } from './PortalArtwork';
-import { PortalIcon } from './PortalIcon';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { TopicLessonLayout } from './TopicLessonLayout';
@@ -30,12 +29,12 @@ export function SubjectLearning({paper,topics,progress,level,backHref,onUpdate,p
   <Link className={styles.back} href={backHref}>← My subjects</Link>
   <header className={styles.hero}>
    {tab==='path'&&<div className={styles.image} aria-hidden="true"><PortalArtwork kind={subjectIcon(paper.name)}/><span>{paper.code}</span></div>}
-   <div className={styles.heroContent}><span className={styles.eyebrow}>{level} · {paper.code}</span><h1>{paper.name}</h1>
+   <div className={styles.heroContent}><span className={styles.eyebrow}>{paper.code}</span><h1>{paper.name}</h1>
    <div className={styles.metrics}><div><small>Syllabus coverage</small><strong>Not yet measured</strong></div><div><small>Current phase</small><strong>{records.some(r=>r.lastStudied||r.status!=='Not Started')?'Learning':'Not Started'}</strong></div><div><small>Current topic</small><strong>{current?.topicName||'Awaiting publication'}</strong></div><div><small>Next study session</small><Link href={weeklyHref}>View Weekly Plan →</Link></div></div>
    <div className={styles.resume}><div><small>{recent?'CONTINUE LEARNING':'START LEARNING'}</small><h2>{current?.topicName||'Your topics will appear here'}</h2><p>{next?`Next topic: ${next.topicName}`:current?'Last topic in the current list.':'The topic list for this subject has not been published yet.'}</p></div>{current&&<Link className={styles.primary} href={lessonHref(current.id)}>{recent?'Continue':'Open topic'} →</Link>}</div>
    </div>
   </header>
-  <nav className="mv-actions" aria-label="Subject shortcuts">{current&&<Link className="mv-button" href={lessonHref(current.id)}><PortalIcon name="subjects"/>Continue learning</Link>}<Link className="mv-button mv-button-outline" href={weeklyHref}><PortalIcon name="weekly"/>Plan a session</Link>{!preview&&<Link className="mv-button mv-button-outline" href={`/dashboard?view=resources&subject=${encodeURIComponent(paper.id)}`}><PortalIcon name="resources"/>Resources</Link>}</nav>
+
   <nav className={styles.tabs} aria-label="Subject sections"><Link aria-current={tab==='path'?'page':undefined} href={tabHref('path')}>Study Path</Link><Link aria-current={tab==='syllabus'?'page':undefined} href={tabHref('syllabus')}>Syllabus</Link>{!preview&&<Link className={styles.resources} href={`/dashboard?view=resources&subject=${encodeURIComponent(paper.id)}`}>Additional resources →</Link>}</nav>
   <SubjectSyllabus key={paper.id+'-'+tab+'-'+(params.get('area')||'')} view={tab} topics={ordered} progress={records} lessonHref={lessonHref} pathHref={tabHref('path')} syllabusHref={tabHref('syllabus')} selectedArea={params.get('area')}/>
   {preview&&<p className={styles.notice}>Preview · Sample topic records. Changes are temporary.</p>}

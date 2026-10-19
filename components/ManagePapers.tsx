@@ -111,11 +111,11 @@ export function ManagePapers({ studentId, adminMode = false }: { studentId: stri
           {error && <p className="mt-4 text-sm font-medium text-[#8C4E3E]" role="alert">{error}</p>}
 
           <div className="mt-5 flex flex-wrap gap-3">
-            <button type="button" onClick={() => void save()} disabled={selected.length === 0 || syncing} className="focus-ring min-h-11 rounded-md bg-[#365B46] px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-45">
+            <button type="button" onClick={() => void save()} disabled={selected.length === 0 || syncing} className="mv-button">
               {syncing ? "Saving…" : "Save papers"}
             </button>
             {studentPaperIds.length > 0 && (
-              <button type="button" onClick={cancel} disabled={syncing} className="focus-ring min-h-11 rounded-md border border-[#D5DBD7] bg-white px-4 text-sm font-semibold text-[#4F5953]">Cancel</button>
+              <button type="button" onClick={cancel} disabled={syncing} className="mv-button mv-button-outline">Cancel</button>
             )}
           </div>
         </section>

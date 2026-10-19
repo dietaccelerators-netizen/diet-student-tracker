@@ -26,7 +26,7 @@ export function PriorityItem({ paper, topic, progress, adminStudentId }: { paper
           <div className="mt-3 flex flex-col gap-2 sm:flex-row">
             <label className="sr-only" htmlFor={`next-${progress.id}`}>Next step</label>
             <input id={`next-${progress.id}`} value={progress.nextStep} onChange={(event) => updateProgress(progress.id, { nextStep: event.target.value })} className="focus-ring min-h-11 flex-1 rounded-md border border-[#CBD3CE] bg-white px-3 text-sm" />
-            <button onClick={() => setEditing(false)} className="focus-ring min-h-11 rounded-md bg-[#365B46] px-4 text-sm font-semibold text-white">Done</button>
+            <button onClick={() => setEditing(false)} className="mv-button">Done</button>
           </div>
         ) : (
           <p className="mt-2 text-sm leading-6 text-[#5B645E]"><span className="font-medium text-[#303832]">Next:</span> {progress.nextStep || "Add a clear next step"}</p>
