@@ -778,3 +778,9 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 @media(prefers-reduced-motion:reduce){.mv-format-live:hover{transform:none}}
 
 .manage-papers-panel,.quiz-review article{background:var(--ui-surface);border:1px solid var(--ui-card-border);border-radius:var(--ui-card-radius);padding:var(--ui-card-padding);box-shadow:var(--ui-card-shadow)}
+
+/* Typography rollout, batch 1: Home navigation and account chrome only. */
+main:has(.da-home) .app-sidebar .nav-item{font-family:var(--font-source-sans),Arial,sans-serif;font-size:16px;line-height:24px;font-weight:500;white-space:normal}
+main:has(.da-home) .app-topbar{font-family:var(--font-source-sans),Arial,sans-serif;font-size:15px;line-height:22px}
+main:has(.da-home) .da-sidebar-support{font-family:var(--font-source-sans),Arial,sans-serif;font-size:15px;line-height:22px;font-weight:600}
+main:has(.da-home) .da-sidebar-support p{font-size:15px;line-height:22px;font-weight:400}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { EB_Garamond, Inter, Manrope, Outfit } from "next/font/google";
+import { EB_Garamond, Inter, Manrope, Outfit, Space_Grotesk, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import { TrackerProvider } from "@/components/TrackerProvider";
 import { initialTrackerState } from "@/lib/mock-data";
@@ -12,6 +12,9 @@ const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
 const display = Outfit({ subsets: ["latin"], variable: "--font-display" });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const garamond = EB_Garamond({ subsets: ["latin"], variable: "--font-garamond" });
+
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], weight: ["600", "700"], variable: "--font-space-grotesk", display: "swap" });
+const sourceSans = Source_Sans_3({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-source-sans", display: "swap" });
 
 export const metadata: Metadata = {
   title: {
@@ -53,7 +56,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${garamond.variable} ${manrope.variable} ${display.variable}`}>
+      <body className={`${inter.variable} ${garamond.variable} ${manrope.variable} ${display.variable} ${spaceGrotesk.variable} ${sourceSans.variable}`}>
         <TrackerProvider initialState={initialState} currentUserId={currentUserId} backend={backend}>
           {children}
         </TrackerProvider>
