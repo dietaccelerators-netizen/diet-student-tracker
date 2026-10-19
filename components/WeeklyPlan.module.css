@@ -27,3 +27,51 @@
 .freeDialog{margin:auto;width:min(620px,calc(100% - 32px));max-height:90vh;overflow:auto;border:1px solid #d8e5f5;border-radius:18px;padding:28px;background:#fff;color:#08245c;box-shadow:0 20px 70px #08245c30}.freeDialog::backdrop{background:#08245c66}.dialogHead{display:flex;justify-content:space-between;align-items:start;gap:20px}.dialogHead h2{font-size:23px;font-weight:650}.dialogHead p{font-size:13px;color:#64748b}.dialogHead>button{border-radius:50%;min-width:40px;min-height:40px}.freeDialog fieldset{border:0;padding:0;margin:24px 0}.freeDialog legend{font-size:14px;font-weight:600;margin-bottom:12px}.timeChoices{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.timeChoices button{min-height:48px;border-radius:10px}.freeSuggestion{padding:22px;border:1px solid #d8e5f5;border-radius:14px;background:#f8faff}.freeSuggestion small{font-size:10px;letter-spacing:.06em;color:#64748b}.freeSuggestion h3{font-size:18px;font-weight:650;margin:12px 0}.freeSuggestion p{font-size:13px;color:#64748b}.freeLinks{display:grid;gap:10px;margin-top:20px}.freeLinks a{padding:12px;background:white;border:1px solid #d8e5f5;border-radius:10px;color:#0759e6;font-size:13px}
 @media(max-width:1100px){.calendar{grid-template-columns:repeat(7,minmax(145px,1fr))}.recommendations{grid-template-columns:1fr}.header{align-items:start;flex-direction:column}.monthGrid>button{min-height:100px}}
 @media(max-width:640px){.page{padding:20px 0 40px}.stats{grid-template-columns:1fr 1fr}.header .freeAction{width:100%}.tabs a{padding:14px 18px}.lectureGrid{grid-template-columns:1fr}.session{display:grid;grid-template-columns:auto 1fr;padding:18px;gap:12px}.sessionCopy{grid-column:1/-1;min-width:0}.session .studyLink{grid-column:1/-1}.session .subjectCode{justify-self:start}.dayHead{padding:16px 18px}.recovery{flex-direction:column;align-items:stretch}.month{overflow-x:auto}.monthGrid{min-width:560px}.freeDialog{padding:20px}.timeChoices{gap:6px}.calendar .session{display:flex;flex-direction:column}}
+
+/* Approved typography, Weekly Plan rollout. Scoped to this page and its dialog.
+   Repeated scope deliberately outranks the legacy portal-wide Inter rules. */
+.page.page.page {font-family:var(--font-source-sans),Arial,sans-serif;font-size:18px;line-height:27px;color:#08245c;--ui-button-font:17px}
+.page.page.page :is(p,li,dd,dt,span,small,strong,b,label,legend,input,select,textarea,a,button,th,td,summary){font-family:var(--font-source-sans),Arial,sans-serif}
+.page.page.page :is(h1,h2,h3,h4,h5){font-family:var(--font-space-grotesk),Arial,sans-serif;font-weight:600;letter-spacing:-.02em;color:#08245c;overflow-wrap:break-word}
+.page.page.page h1{font-size:32px;line-height:40px}
+.page.page.page :is(h2,h3){font-size:25px;line-height:34px}
+.page.page.page :is(h4,h5){font-size:22px;line-height:30px}
+.page.page.page p{font-size:18px;line-height:27px;font-weight:400}
+.page.page.page :is(small,label,legend,th){font-size:15px;line-height:22px}
+.page.page.page :is(button,a){font-size:17px;line-height:24px;font-weight:600;white-space:normal}
+.page.page.page :is(input,select,textarea,td){font-size:18px;line-height:27px;font-variant-numeric:tabular-nums}
+.page.page.page .tabs a,.page.page.page [aria-label="Plan setup steps"] button{font-size:16px;line-height:24px;font-weight:500}
+.page.page.page .tabs{flex-wrap:wrap;overflow:visible}
+.page.page.page .stats strong{font-family:var(--font-space-grotesk),Arial,sans-serif;font-size:32px;line-height:40px;font-weight:600;font-variant-numeric:tabular-nums}
+.page.page.page :is(.stats p,.notice,.hint,.badge,.blank,.pending,.eyebrow,.subjectCode,.dayHead>span,.sessionCopy p,.lectureItem p,.freeSuggestion small){font-size:15px;line-height:22px}
+.page.page.page .eyebrow{letter-spacing:.06em}
+.page.page.page :is(.time,.time b){font-size:16px;line-height:24px;font-variant-numeric:tabular-nums}
+.page.page.page .time{width:96px}
+.page.page.page .dayHead small{font-size:14px;line-height:20px}
+.page.page.page .calendar{grid-template-columns:repeat(7,minmax(180px,1fr))}
+.page.page.page .calendar :is(h4,h5){font-size:18px;line-height:26px}
+.page.page.page .calendar .dayHead>span{font-size:14px;line-height:20px}
+.page.page.page .monthGrid>b{font-size:16px;line-height:24px;font-weight:600}
+.page.page.page .monthGrid span{font-size:15px;line-height:22px}
+.page.page.page .monthGrid small{font-size:14px;line-height:20px}
+.page.page.page .monthGrid>button{height:auto;min-height:120px}
+.page.page.page .dialogHead>button{font-size:24px;line-height:24px;flex-shrink:0}
+.page.page.page .timeChoices button{padding:10px 8px}
+.page.page.page [aria-label="Weekly plan setup"] :is(p[class],small){font-size:15px;line-height:22px}
+.page.page.page [aria-label="Weekly plan setup"] :is(label,legend){font-size:16px;line-height:24px}
+.page.page.page [aria-label="Weekly plan setup"] h3{font-size:22px;line-height:30px}
+.page.page.page [aria-label="Study sessions"] [role="timer"]{font-family:var(--font-space-grotesk),Arial,sans-serif;font-size:40px;line-height:48px;font-weight:600;font-variant-numeric:tabular-nums}
+.page.page.page [aria-label="Study session controls"]>p:not([role="timer"]){font-size:15px;line-height:22px}
+.page.page.page [aria-label="Study sessions"] summary{font-size:17px;line-height:24px}
+@media(max-width:640px){
+ .page.page.page{font-size:17px;line-height:26px;--ui-button-font:16px}
+ .page.page.page h1{font-size:26px;line-height:34px}
+ .page.page.page :is(h2,h3){font-size:23px;line-height:32px}
+ .page.page.page :is(h4,h5),.page.page.page [aria-label="Weekly plan setup"] h3{font-size:21px;line-height:29px}
+ .page.page.page p{font-size:17px;line-height:26px}
+ .page.page.page :is(button,a){font-size:16px;line-height:24px}
+ .page.page.page .stats strong{font-size:28px;line-height:36px}
+ .page.page.page .monthGrid{min-width:840px}
+ .page.page.page .timeChoices{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .page.page.page [aria-label="Study sessions"] [role="timer"]{font-size:32px;line-height:40px}
+}
