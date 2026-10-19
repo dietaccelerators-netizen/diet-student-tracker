@@ -1,0 +1,14 @@
+.view{--study-size:20px;min-width:0}
+.view[data-study-full]{position:fixed;inset:0;z-index:1000;overflow:auto;background:#eef6ff;padding:0 24px 40px}
+.view:fullscreen{width:100%;height:100%;max-width:none}
+.toolbar{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:12px;padding:12px 0;margin-bottom:12px;background:#eef6ff}
+.view[data-study-full] .toolbar{position:sticky;top:0;z-index:10;border-bottom:1px solid #d8e5f5;padding:14px 0}
+.view.view.view .toolbar :is(label,select,button,span){font-family:var(--font-source-sans),Arial,sans-serif;font-size:16px;line-height:24px;color:#08245c}
+.toolbar label{display:flex;align-items:center;gap:10px}
+.view.view.view .toolbar :is(select,button){background:white;border:1px solid #b9cce4;border-radius:10px;min-height:44px;padding:8px 14px;cursor:pointer}
+.view.view.view .toolbar button{background:#0759e6;color:white;font-weight:600}
+.toolbar :is(select,button):focus-visible{outline:3px solid #76aaff;outline-offset:3px}
+.view.view.view .toolbar span{font-size:14px}
+.view.view.view [data-reading-content] :is(p,li),.view.view.view :global(.quiz-question legend),.view.view.view :global(.quiz-option),.view.view.view :global(.quiz-option span),.view.view.view :global(.quiz-review h4),.view.view.view :global(.quiz-review p),.view.view.view :global(.quiz-explanation){font-family:var(--font-source-sans),Arial,sans-serif;font-size:var(--study-size);line-height:1.6;overflow-wrap:break-word}
+.view[data-study-full]>section{max-width:1400px;margin-inline:auto}
+@media(max-width:600px){.view{--study-size:19px}.view[data-study-full]{padding:0 16px 28px}.toolbar{justify-content:space-between}}
