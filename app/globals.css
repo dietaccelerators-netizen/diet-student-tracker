@@ -786,4 +786,4 @@ main:has(.da-home, [aria-label="My subjects"], [aria-label="Subject workspace"],
 main:has(.da-home, [aria-label="My subjects"], [aria-label="Subject workspace"], [aria-label="Topic learning workspace"]) .da-sidebar-support p{font-size:15px;line-height:22px;font-weight:400}
 
 /* Explicit text families prevent legacy reading styles overriding inheritance. */
-:is([aria-label="My subjects"],[aria-label="Subject workspace"],[aria-label="Topic learning workspace"]) :is(p,li,dd,dt,span,small,strong,b,label,input,select,a,button,th,td,caption){font-family:var(--font-source-sans),Arial,sans-serif}
+:is([aria-label="My subjects"],[aria-label="Subject workspace"],[aria-label="Topic learning workspace"]):is([aria-label="My subjects"],[aria-label="Subject workspace"],[aria-label="Topic learning workspace"]) :is(p,li,dd,dt,span,small,strong,b,label,input,select,a,button,th,td,caption){font-family:var(--font-source-sans),Arial,sans-serif}
