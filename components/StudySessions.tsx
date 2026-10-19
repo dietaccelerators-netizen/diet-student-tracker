@@ -4,7 +4,7 @@ import { blockKey, elapsed, isOpen, loadSessions, saveSession, timerText, transi
 import type { Paper, Profile } from '@/lib/types';
 import styles from './StudySessions.module.css';
 
-export function StudySessions({student,papers,week,end,selected,preview,onClose,onActivity}: {student:Profile;papers:Paper[];week:string;end:string;selected:StudyBlock|null;preview:boolean;onClose:()=>void;onActivity?:(rows:StudySession[],ready:boolean)=>void}) {
+export function StudySessions({student,papers,week,end,selected,preview,onClose,onActivity,compact=false}: {student:Profile;papers:Paper[];week:string;end:string;selected:StudyBlock|null;preview:boolean;onClose:()=>void;onActivity?:(rows:StudySession[],ready:boolean)=>void;compact?:boolean}) {
   const [rows,setRows]=useState<StudySession[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[reload,setReload]=useState(0);
   const target=useRef<HTMLElement>(null);
   useEffect(()=>{
@@ -23,9 +23,9 @@ export function StudySessions({student,papers,week,end,selected,preview,onClose,
     setRows(old=>[saved,...old.filter(s=>s.id!==saved.id)]);
   }
   return <section ref={target} className={styles.workspace} aria-label="Study sessions">
-    <div className={styles.summary}><div><span>RECORDED STUDY</span><h3>{loading||error?'—':`${Math.round(history.reduce((n,s)=>n+s.elapsed_seconds,0)/60)} min`}</h3><p>{history.length} finished session{history.length===1?'':'s'} assigned to this week</p></div><div><b>{history.filter(s=>s.status==='completed').length} completed</b><p>{history.filter(s=>s.status==='partial').length} partly completed</p></div></div>
+    {!compact&&<div className={styles.summary}><div><span>RECORDED STUDY</span><h3>{loading||error?'—':`${Math.round(history.reduce((n,s)=>n+s.elapsed_seconds,0)/60)} min`}</h3><p>{history.length} finished session{history.length===1?'':'s'} assigned to this week</p></div><div><b>{history.filter(s=>s.status==='completed').length} completed</b><p>{history.filter(s=>s.status==='partial').length} partly completed</p></div></div>}
     {loading?<p role="status">Loading study sessions…</p>:error?<div role="alert"><p>{error}</p><button onClick={()=>setReload(n=>n+1)}>Retry loading sessions</button></div>:<>
-      {active && selected && current?.id!==active.id?<div className={styles.notice}><p>You have an unfinished session: <b>{active.paper_name}</b>. Finish it before starting another.</p><button onClick={onClose}>Return to unfinished session</button></div>:(selected||current)?<SessionPanel key={current?.id||blockKey(selected!)} row={current} block={selected} student={student} paperName={papers.find(p=>p.id===selected?.paperId)?.name||current?.paper_name||'Subject'} preview={preview} save={save} onClose={onClose} onReload={()=>setReload(n=>n+1)}/>:<p>Choose <b>View session</b> on a study block to set a goal and start your timer.</p>}
+      {active && selected && current?.id!==active.id?<div className={styles.notice}><p>You have an unfinished session: <b>{active.paper_name}</b>. Finish it before starting another.</p><button onClick={onClose}>Return to unfinished session</button></div>:(selected||current)?<SessionPanel key={current?.id||blockKey(selected!)} row={current} block={selected} student={student} paperName={papers.find(p=>p.id===selected?.paperId)?.name||current?.paper_name||'Subject'} preview={preview} save={save} onClose={onClose} onReload={()=>setReload(n=>n+1)}/>:!compact?<p>Choose <b>View session</b> on a study block to set a goal and start your timer.</p>:null}
       {history.length>0&&<details className={styles.history}><summary>Saved session history for this week</summary>{history.map(s=><article key={s.id}><div><b>{s.paper_name}</b><p>{s.goal}</p><small>Planned for {s.plan_date} · Finished {s.finished_at?new Date(s.finished_at).toLocaleString():''}</small>{s.notes&&<p>{s.notes}</p>}</div><span>{s.status==='completed'?'Completed':'Partly completed'} · {timerText(s.elapsed_seconds)}</span></article>)}</details>}
     </>}
   </section>;
