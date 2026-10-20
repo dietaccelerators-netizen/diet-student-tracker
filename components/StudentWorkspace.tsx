@@ -3,7 +3,6 @@ import { StudyResources } from './StudyResources';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { LearningReportOverview } from './LearningReportOverview';
-import { StudyActivityReport } from './StudyActivityReport';
 import { useTracker } from './TrackerProvider';
 import { PracticeRoom } from './PracticeRoom';
 import { StudentSubjects } from './StudentSubjects';
@@ -20,12 +19,12 @@ export function StudentWorkspace({studentId,view='home'}:{studentId:string;view?
  const stage=stageFor(student.level), stageLabel=stage??student.level;
  const names:Record<string,string>={home:'My learning space',subjects:'My subjects',weekly:'Weekly plan',practice:'Practice room',report:'Learning report',profile:'My profile',resources:'Study resources'};
  const selected=names[view]?view:'home';
+ if(selected==='report')return <LearningReportOverview key={studentId} state={state} studentId={studentId}/>;
  if(selected==='weekly')return <WeeklyPlan key={studentId} student={student} papers={papers}/>;
  if(selected==='subjects')return <StudentSubjects state={state} studentId={studentId} managePapers={<ManagePapers studentId={studentId}/>}/>;
  if(selected==='practice')return <PracticeRoom key={studentId+params.toString()} studentId={studentId} papers={papers} topics={state.topics}/>;
  return <div className="student-workspace"><div className={`workspace-toolbar ${selected==='home'?'home-toolbar-hidden':''}`}><div><span className="eyebrow">{stage?.startsWith('ATS')?'ATSWA':'ICAN'} / {stageLabel || 'Student'}</span><h1>{names[selected]}</h1></div><Link href="/dashboard?view=profile" className="student-avatar" aria-label="Open my profile">{student.fullName.split(' ').map(n=>n[0]).slice(0,2).join('')}</Link></div>
  {selected==='home' && <StudentOverview studentId={studentId}/>}
- {selected==='report' && <><LearningReportOverview/><details className="report-panel"><summary>Existing recorded activity and topic confidence</summary><StudyActivityReport key={studentId+student.level} userId={studentId} stage={student.level}/><p className="section-description">A clear view of the preparation you have recorded. Confidence is self-reported, not an exam score.</p><div className="report-stats">{(['Okay','Learning','Needs Practice','Not Started'] as const).map(status=><div key={status}><strong>{progress.filter(p=>p.status===status).length}</strong><span>{status==='Okay'?'Feeling confident':status}</span></div>)}</div><section className="report-panel"><h2>Subject progress</h2>{papers.map(p=>{const topics=state.topics.filter(t=>t.paperId===p.id);const ids=new Set(topics.map(t=>t.id));const confident=progress.filter(r=>ids.has(r.topicId)&&r.status==='Okay').length;const percent=topics.length?Math.round(confident/topics.length*100):0;return <Link href={`/papers/${p.id}`} className="report-row" key={p.id}><div><b>{p.name}</b><small>{topics.length?`${confident} of ${topics.length} topics marked confident`:'Topic list awaiting publication'}</small></div><progress value={percent} max={100} aria-label={`${p.name} confidence`}/><strong>{percent}%</strong></Link>;})}</section></details></>}
  {selected==='profile' && <section className="profile-panel"><span className="eyebrow">YOUR STUDENT ACCOUNT</span><h2>{student.fullName}</h2><dl className="profile-review"><div><dt>First name</dt><dd>{student.fullName.split(' ')[0]}</dd></div><div><dt>Last name</dt><dd>{student.fullName.split(' ').slice(1).join(' ')||'—'}</dd></div><div><dt>Email</dt><dd>{student.email}</dd></div><div><dt>Exam stage</dt><dd>{stageLabel||'Not set'}</dd></div><div><dt>Exam diet</dt><dd>{student.examDiet||'Not set yet'}</dd></div><div><dt>Active subjects</dt><dd>{papers.length}</dd></div></dl><p>Need to correct your name or move to another stage? Contact your Mastrevo coordinator so your saved progress stays connected to your account.</p><ManagePapers studentId={studentId}/></section>}
  {selected==='resources' && <StudyResources level={student.level}/>}
  </div>;
