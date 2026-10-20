@@ -4,10 +4,11 @@ import styles from './StudyView.module.css';
 
 const key='mastrevo-reading-size';
 const sizes=[18,20,22,24];
-export function StudyView({children}:{children:ReactNode}) {
+export function StudyView({children,readingOnly=false,enabled=true}:{children:ReactNode;readingOnly?:boolean;enabled?:boolean}) {
  const root=useRef<HTMLDivElement>(null);
  const toggle=useRef<HTMLButtonElement>(null);
  const [full,setFull]=useState(false);
+ const [showControls,setShowControls]=useState(false);
  const [size,setSize]=useState<number|null>(null);
  useEffect(()=>{try{const saved=Number(localStorage.getItem(key));if(sizes.includes(saved))setSize(saved);}catch{}},[]);
  useEffect(()=>{
@@ -33,12 +34,13 @@ export function StudyView({children}:{children:ReactNode}) {
   // A full-window focus view remains available when browser fullscreen is unsupported.
   try{await root.current?.requestFullscreen?.();}catch{}
  };
- return <div ref={root} className={styles.view} data-study-full={full||undefined} style={size?{'--study-size':`${size}px`} as CSSProperties:undefined}>
-  <div className={styles.toolbar} role="group" aria-label="Study display settings">
+ return <div ref={root} className={styles.view} data-study-full={full||undefined} data-reading-only={readingOnly||undefined} style={size?{'--study-size':`${size}px`} as CSSProperties:undefined}>
+  {full&&readingOnly&&<button className={styles.reveal} aria-expanded={showControls} aria-label="Reading controls" onClick={()=>setShowControls(v=>!v)}>Aa ···</button>}
+  {enabled&&<div hidden={full&&readingOnly&&!showControls} className={styles.toolbar} role="group" aria-label="Study display settings">
    <label>Text size <select aria-label="Study text size" value={size??'default'} onChange={e=>change(e.target.value)}><option value="default">Default</option>{sizes.map(n=><option key={n} value={n}>{n} px</option>)}</select></label>
    <button ref={toggle} type="button" aria-pressed={full} onClick={expand}>{full?'Exit full screen':'Full screen'}</button>
    {full&&<span>Press Esc to exit</span>}
-  </div>
+  </div>}
   {children}
  </div>;
 }
