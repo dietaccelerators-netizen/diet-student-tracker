@@ -71,7 +71,7 @@
 @media(max-width:600px){.home.home .welcome h1{font-size:26px;line-height:34px}.home.home h2{font-size:23px;line-height:32px}.home.home h3,.home.home .exam h2,.home.home .statusHeading h2,.home.home .weakCard h2{font-size:21px;line-height:29px}.home.home p{font-size:17px;line-height:26px}.home.home .primary,.home.home .secondary,.home.home .textLink,.home.home .exam a,.home.home .sessions a{font-size:16px;line-height:24px}.home.home .banner h2{font-size:26px;line-height:34px}.home.home .banner{min-height:0;padding:24px 30px 42px}.home.home .bannerCopy{max-width:100%}.home.home .studyCards{grid-template-columns:1fr}.home.home .side{display:contents}.home.home .studyCards>.card{min-height:0}.home.home .exam strong{font-size:28px;line-height:36px}.home.home .exam p{font-size:15px;line-height:22px}.home.home .continueContent>.artFrame:first-child{width:90px;min-width:90px;flex-basis:90px}.home.home .continueContent>div:last-child{flex-basis:150px}}
 
 /* Approved Home typography: Manrope headings and Source Sans 3 text. */
-.home.home.home h1,.home.home.home h2,.home.home.home h3,.home.home.home .exam strong{font-family:var(--font-manrope),Arial,sans-serif;font-weight:600;letter-spacing:-.015em}
+.home.home.home h1,.home.home.home h2,.home.home.home h3,.home.home.home .exam strong{font-family:var(--font-manrope),Arial,sans-serif;font-weight:700;color:#08245c;letter-spacing:-.015em}
 .home.home.home h2{font-size:24px;line-height:33px}
 .home.home.home h3{font-size:20px;line-height:28px}
 .home.home.home .exam h2,.home.home.home .statusHeading h2,.home.home.home .weakCard h2{font-size:20px;line-height:28px}
@@ -79,3 +79,9 @@
 @media(max-width:600px){.home.home.home h2{font-size:22px;line-height:30px}.home.home.home h3,.home.home.home .exam h2,.home.home.home .statusHeading h2,.home.home.home .weakCard h2{font-size:19px;line-height:27px}.home.home.home .banner h2{font-size:26px;line-height:34px}}
 .home.home.home :is(p,span,small,a,button,input,li,strong,b){font-family:var(--font-source-sans),Arial,sans-serif}
 .home.home.home .exam strong{font-family:var(--font-manrope),Arial,sans-serif}
+
+/* Match the approved sample's dark-blue emphasis. */
+.home.home.home p{color:#08245c;font-weight:500}
+.home.home.home :is(b,strong){color:#08245c;font-weight:600}
+.home.home.home .exam strong{font-weight:700}
+.home.home.home .primary{color:#fff;font-weight:600}
