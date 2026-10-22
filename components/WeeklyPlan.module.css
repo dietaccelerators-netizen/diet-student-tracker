@@ -75,3 +75,9 @@
  .page.page.page .timeChoices{grid-template-columns:repeat(2,minmax(0,1fr))}
  .page.page.page [aria-label="Study sessions"] [role="timer"]{font-size:32px;line-height:40px}
 }
+
+/* Match the thicker navy emphasis approved for My Subjects. */
+.page.page.page :is(h1,h2,h3,h4,h5),.page.page.page .stats strong{font-weight:700;color:#08245c;-webkit-text-stroke:.35px currentColor}
+.page.page.page :is(p,dt,dd,label,legend,.hint,.time,.stats small){color:#08245c}
+.page.page.page :is(strong,b){font-weight:600}
+.page.page.page .stats strong{font-weight:700}
