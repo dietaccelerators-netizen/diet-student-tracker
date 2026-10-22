@@ -34,3 +34,9 @@
 /* Scale the complete shared illustration, including its positioned layers. */
 .art{position:relative;height:120px;width:140px}.art>div{position:absolute;top:0;left:0;transform:scale(.6);transform-origin:top left;margin:0}
 @media(min-width:701px) and (max-width:1050px){.art{height:100px;width:120px}.art>div{transform:scale(.52)}}
+
+/* Match the thicker navy emphasis approved for My Subjects and Weekly Plan. */
+.page.page.page :is(h1,h2,h3,h4,h5),.page.page.page .timerDisplay{font-weight:700;color:#08245c;-webkit-text-stroke:.35px currentColor}
+.page.page.page :is(p,label,.small,.meta,.heroMeta,.eyebrow){color:#08245c}
+.page.page.page :is(strong,b){font-weight:600;color:#08245c}
+.page.page.page .timerDisplay small{font-weight:400;-webkit-text-stroke:0}
