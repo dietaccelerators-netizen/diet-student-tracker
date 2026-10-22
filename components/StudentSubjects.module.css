@@ -39,3 +39,7 @@
 .page.page.page :is(.header p,.resume p,.resume small,.card dd,.card dt,.coverage,.coverage strong,.search span,.manage,.results,.footnote,.empty p){color:#08245c}
 .page.page.page :is(.card dd,.coverage strong,.search span){font-weight:600}
 .page.page.page .continue{color:#08245c;font-weight:600}
+
+/* Extra heading thickness without changing the subject font family. */
+.page.page.page :is(h1,h2,h3,h4){-webkit-text-stroke:.35px currentColor}
+.page.page.page .card dd{font-weight:600;-webkit-text-stroke:.15px currentColor}
