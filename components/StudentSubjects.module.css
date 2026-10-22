@@ -33,3 +33,9 @@
 .page.page .resume>div{min-width:0}.page.page .resume>a{flex-shrink:0}
 @media(min-width:1400px){.page.page .grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:620px){.page.page .grid{grid-template-columns:1fr}.page.page .header h1{font-size:26px;line-height:34px}.page.page :is(.resume h2,.card h2,.empty h2){font-size:21px;line-height:29px}.page.page :is(.header p,.resume p,.card dd,.empty p){font-size:17px;line-height:26px}.page.page :is(.primary,.continue){font-size:16px}}
+
+/* Bold navy emphasis; retain the approved subject font families and sizes. */
+.page.page.page :is(h1,h2,h3,h4){font-weight:700;color:#08245c}
+.page.page.page :is(.header p,.resume p,.resume small,.card dd,.card dt,.coverage,.coverage strong,.search span,.manage,.results,.footnote,.empty p){color:#08245c}
+.page.page.page :is(.card dd,.coverage strong,.search span){font-weight:600}
+.page.page.page .continue{color:#08245c;font-weight:600}
