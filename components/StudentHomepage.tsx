@@ -7,7 +7,7 @@ import type { TrackerState } from '@/lib/types';
 import { getStudent, getStudentPapers, getStudentProgress } from '@/lib/selectors';
 import { stageFor } from '@/lib/stages';
 import { loadPlanAccount, parseActive, type ActivePlan } from '@/lib/weekly-plan-storage';
-import { propose } from '@/lib/plan-setup';
+import { scheduledRange } from '@/lib/plan-schedule';
 import { loadSessions, blockKey, type StudySession } from '@/lib/study-sessions';
 import styles from './StudentHomepage.module.css';
 
@@ -73,7 +73,7 @@ export function StudentHomepage({state,studentId,preview=false}:{state:TrackerSt
  const weakTopic=state.topics.find(t=>t.id===weak?.topicId);
  const day=data.today?(new Date(`${data.today}T12:00:00Z`).getUTCDay()+6)%7:0;
  const week=data.today?addDays(data.today,-day):'';
- const blocks=data.plan?propose(data.plan.draft,data.plan.paperIds).filter(s=>papers.some(p=>p.id===s.paperId)).map(s=>({...s,date:addDays(week,s.day)})):[];
+ const blocks=data.plan?scheduledRange(data.plan,week,addDays(week,6),papers.map(p=>p.id)):[];
  const completed=(s:typeof blocks[number])=>data.rows.some(r=>r.block_key===blockKey(s)&&r.status==='completed');
  const todayBlocks=blocks.filter(s=>s.date===data.today);
  const done=blocks.filter(completed).length;

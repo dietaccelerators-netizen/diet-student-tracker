@@ -13,7 +13,7 @@ export function StudySessions({student,papers,week,end,selected,preview,onClose,
     loadSessions(student.id,student.level,week,end,preview).then(data=>{if(!cancelled){setRows(data);setLoading(false);}}).catch(e=>{if(!cancelled){setError(e.message);setLoading(false);}});
     return()=>{cancelled=true;};
   },[student.id,student.level,week,end,preview,reload]);
-  useEffect(()=>{if(selected)target.current?.scrollIntoView({behavior:'smooth',block:'start'});},[selected]);
+  useEffect(()=>{if(selected)target.current?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});},[selected]);
   useEffect(()=>{onActivity?.(rows,!loading&&!error);},[rows,loading,error,onActivity]);
   const active=rows.find(isOpen);
   const current=selected?rows.find(s=>s.block_key===blockKey(selected)):active;
