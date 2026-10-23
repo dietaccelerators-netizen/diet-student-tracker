@@ -22,3 +22,16 @@
 .view.view.view .reveal{position:fixed;right:16px;top:12px;z-index:11;min-height:40px;padding:8px 12px;border:1px solid #d8e5f5;background:white;color:#08245c;border-radius:10px;font:500 15px/22px var(--font-source-sans),Arial,sans-serif;cursor:pointer}
 .view .reveal:focus-visible{outline:3px solid #76aaff;outline-offset:3px}
 @media(max-width:600px){.view[data-study-full][data-reading-only]{padding:50px 20px 40px}}
+
+/* A quiet page, with controls that stay out of the reading column. */
+.view.view.view [data-reading-content] :is(p,li,td,th){font-size:var(--study-size);line-height:1.8;font-weight:400;letter-spacing:normal;-webkit-text-stroke:0;color:#304158}
+.view.view.view [data-reading-content] :is(strong,b){font-weight:650;color:#08245c;-webkit-text-stroke:0}
+.view[data-study-full][data-reading-only] [data-reading-content]{max-width:68ch;font-size:var(--study-size);padding-top:40px}
+.view[data-study-full][data-reading-only] [data-reading-content]>div:first-child{display:block}
+.view[data-study-full][data-reading-only] .toolbar{max-width:min(430px,calc(100% - 32px));justify-content:flex-start;gap:14px;z-index:20}
+.toolbar small{flex-basis:100%;font-size:13px;color:#526781;line-height:1.5}
+.view.view.view .toolbar [aria-pressed=false]{background:white;color:#08245c}
+.view.view.view .toolbar [aria-pressed=true]{background:#0759e6;color:white}
+.view.view.view .reveal{opacity:.8}.view.view.view .reveal:hover,.view.view.view .reveal:focus-visible{opacity:1}
+.view [data-reading-content] :is(button,a){scroll-margin-block:80px}
+@media(prefers-reduced-motion:reduce){.view *{scroll-behavior:auto!important;animation:none!important;transition:none!important}}

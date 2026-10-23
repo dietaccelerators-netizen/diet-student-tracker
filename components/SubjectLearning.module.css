@@ -35,3 +35,6 @@
 .page.page .areaTitle{font-weight:600}.page.page .number{width:36px;height:36px}
 .page.page .syllabusTable{min-width:850px}.page.page .sections a{flex-shrink:0}
 @media(max-width:600px){.page.page .hero h1{font-size:26px;line-height:34px}.page.page .sectionHead h2{font-size:23px;line-height:32px}.page.page :is(.resume h2,.empty h2,.empty h3,.existingTopics h3,.sampleDetail h3){font-size:21px;line-height:29px}.page.page :is(.resume p,.sectionHead p,.topicBody p,.empty p,.setupNotice p,.existingTopics p,.sampleDetail p,.sampleDetail ol){font-size:17px;line-height:26px}.page.page :is(.primary,.setupNotice button,.textButton,.sectionHead a,.sections a,.empty a){font-size:16px}.page.page .metrics{grid-template-columns:1fr}}
+.pathMarker{display:grid;place-items:center;flex:0 0 28px;width:28px;height:28px;border:1px solid #cbd8e8;border-radius:50%;font-size:16px;color:#6b7d93;background:white}
+.pathMarker[data-state=Complete]{background:#e2f4eb;color:#146b46;border-color:#b5dcca}
+.pathMarker[data-state=Current]{background:#eaf2ff;color:#0759e6;border-color:#9cbde6}

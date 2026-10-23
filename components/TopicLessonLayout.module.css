@@ -42,3 +42,34 @@
 .page.page .readingModes button{min-height:44px}.page.page .badge{white-space:normal}
 @media(max-width:1100px){.page.page .layout{grid-template-columns:1fr}.page.page .outline nav{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.page.page{--ui-button-font:16px}.page.page .header h1{font-size:26px;line-height:34px}.page.page .sectionHeader h2{font-size:23px;line-height:32px}.page.page :is(.reading h3,.reading h4,.outline h2,.practice h3,.handoff h3,.completion h3){font-size:21px;line-height:29px}.page.page :is(.reading>p,.lessonList,.example){font-size:19px;line-height:30px}.page.page :is(.header p,.preview p,.practice p,.handoff p,.completion p){font-size:17px;line-height:26px}.page.page :is(.controls button,.practice button,.practiceLink,.reset){font-size:16px}.page.page.page :global(.mv-button.mv-button.mv-button){font-size:16px}.page.page .reading{padding:20px}.page.page .outline nav{grid-template-columns:1fr}}
+
+/* Reading has its own quieter type scale; dashboard emphasis stops at the page edge. */
+.page.page .reading{font-weight:400;color:#304158;line-height:1.8}
+.page.page .reading :is(h3,h4){color:#08245c;font-weight:650;-webkit-text-stroke:0;line-height:1.35;margin:1.5em 0 .65em}
+.page.page .reading h3{font-size:clamp(26px,1.4em,36px)}
+.page.page .reading h4{font-size:1.12em}
+.page.page .reading :is(p,li){font-weight:400;-webkit-text-stroke:0;color:#304158}
+.page.page .reading p{margin:1em 0;max-width:68ch}
+.page.page .reading .label{font-size:12px;letter-spacing:.09em;color:#526781}
+.keyTakeaways{border-left:3px solid #9cbde6;padding:0 0 0 22px;margin:36px 0}
+.keyTakeaways ul{list-style:disc}
+.solution{margin-top:24px;border-top:1px solid #dce5f1;padding-top:16px}
+.solution summary{cursor:pointer;color:#0759e6;font-size:18px;min-height:44px;line-height:1.6}
+.lessonEnd{margin-top:56px;padding-top:28px;border-top:1px solid #ccd8e6}
+.page.page .lessonEnd h4{margin-top:0}
+.endActions{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:20px 0}
+.practiceText{color:#0759e6;padding:12px;min-height:44px;font-size:17px}
+.page.page .reading .localNote{font-size:14px;color:#607187}
+.readingModes button:disabled{opacity:.5;cursor:not-allowed}
+.step[data-complete]{background:#e2f4eb;color:#146b46}
+.accounting,.equation{margin:30px 0}
+.tableScroll{overflow-x:auto;border:1px solid #ccd8e6;border-radius:10px}
+.tableScroll table{border-collapse:collapse;width:100%}
+.tableScroll caption{text-align:left;font-weight:650;color:#08245c;padding:16px}
+.tableScroll :is(th,td){padding:12px 16px;border-top:1px solid #dce5f1;text-align:left;vertical-align:top;min-width:120px}
+.tableScroll thead{background:#f0f5fa}
+.tableScroll [data-numeric]{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.equation{border-left:3px solid #9cbde6;padding:16px 22px;background:#f5f8fc}
+.equation figcaption{font-weight:650;color:#08245c}
+.tableScroll:focus-visible,.solution summary:focus-visible{outline:3px solid #76aaff;outline-offset:3px}
+@media(max-width:600px){.endActions{align-items:stretch;flex-direction:column}.endActions>*{width:100%}.keyTakeaways{padding-left:14px}.page.page .reading .example{padding:18px}}
