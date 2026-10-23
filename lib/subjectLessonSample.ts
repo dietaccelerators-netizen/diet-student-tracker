@@ -1,5 +1,10 @@
 // Illustrative lesson content supplied by the user. Not published syllabus or saved progress.
-type LearningContentBlock = {
+export type AccountingBlock =
+  | { id: string; kind: 'table' | 'workings'; title: string; columns: string[]; rows: string[][]; numericColumns?: number[]; note?: string }
+  | { id: string; kind: 'equation'; title: string; expression: string; explanation?: string }
+  | { id: string; kind: 'example' | 'model-answer'; title: string; paragraphs: string[] };
+
+export type LearningContentBlock = {
   heading?: string;
   paragraphs: string[];
   pointsHeading?: string;
@@ -33,6 +38,8 @@ export type StudySection = {
   simplifiedContent?: LearningContentBlock;
 
   keyPoints: string[];
+  // Shared in both modes: computations and examinable points must not disappear.
+  accountingBlocks?: AccountingBlock[];
 
   workedExamples: {
     id: string;
