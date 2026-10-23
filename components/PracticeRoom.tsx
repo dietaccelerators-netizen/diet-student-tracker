@@ -1,4 +1,5 @@
 'use client';
+import { usePortalPreferences } from './PortalPreferences';
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -92,6 +93,8 @@ export function PracticeRoom({studentId='preview',papers=emptyPapers,topics=empt
 function Empty({title,text}:{title:string;text:string}){return <div className={styles.empty}><span className={styles.icon}><PortalIcon name="subjects"/></span><h3>{title}</h3><p>{text}</p></div>;}
 
 function WrittenWorkspace({question:q,initial,onDraft,onSave,onClose,notice}:{question:PracticeQuestion;initial:Draft|null;onDraft:(d:Draft)=>void;onSave:(a:Attempt)=>void;onClose:()=>void;notice:string}){
+ const {prefs,ready}=usePortalPreferences();
+ useEffect(()=>{if(ready&&!initial)setMethod(prefs.answer);},[ready,prefs.answer]);
  const [answer,setAnswer]=useState(initial?.answer||'');const [method,setMethod]=useState<'portal'|'paper'>(initial?.method||'portal');
  const [elapsed,setElapsed]=useState(initial?.elapsed||0);const [running,setRunning]=useState(initial?false:true);const [completed,setCompleted]=useState(initial?.completed||false);
  const [score,setScore]=useState(initial?.score||'');const [reflection,setReflection]=useState(initial?.reflection||'');const [confirm,setConfirm]=useState(false);

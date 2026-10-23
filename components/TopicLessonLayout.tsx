@@ -1,6 +1,7 @@
 "use client";
+import { usePortalPreferences } from './PortalPreferences';
 import { StudyView } from "./StudyView";
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { sampleLearningTopic, type StudySection } from '@/lib/subjectLessonSample';
@@ -8,6 +9,7 @@ import styles from './TopicLessonLayout.module.css';
 
 const tabs=['Overview','Study Content','Key Points','Worked Examples'];
 export function TopicLessonLayout({subject,topic,backHref,subjectId,topicId,children}:{subject:string;topic:string;backHref:string;subjectId:string;topicId?:string;children?:ReactNode}) {
+ const {prefs,ready}=usePortalPreferences();
  const params=useSearchParams(),pathname=usePathname();
  const isSample=!topicId;
  const sections:StudySection[]=isSample?sampleLearningTopic.sections:[];
@@ -15,6 +17,7 @@ export function TopicLessonLayout({subject,topic,backHref,subjectId,topicId,chil
  const [section,setSection]=useState(requested>=0?requested:0);
  const [panel,setPanel]=useState(()=>{const n=Number(params.get('content'));return Number.isInteger(n)&&n>=0&&n<4?n:0;});
  const [readingMode,setReadingMode]=useState<'standard'|'simplified'>('standard');
+ useEffect(()=>{if(ready)setReadingMode(prefs.lesson);},[ready,prefs.lesson]);
  const [completed,setCompleted]=useState<string[]>(()=>sections.filter(s=>s.completed).map(s=>s.id));
  const current=sections[section];
  const chooseSection=(index:number)=>{setSection(index);setPanel(0);};

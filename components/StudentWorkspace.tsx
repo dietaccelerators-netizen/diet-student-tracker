@@ -1,4 +1,5 @@
 "use client";
+import { Settings } from './Settings';
 import { HelpSupport } from './HelpSupport';
 import { StudyResources } from './StudyResources';
 import Link from 'next/link';
@@ -18,8 +19,9 @@ export function StudentWorkspace({studentId,view='home'}:{studentId:string;view?
  const student=getStudent(state,studentId); if(!student) return <p>Unable to load your profile. Please sign in again.</p>;
  const papers=getStudentPapers(state,studentId), progress=getStudentProgress(state,studentId);
  const stage=stageFor(student.level), stageLabel=stage??student.level;
- const names:Record<string,string>={home:'My learning space',subjects:'My subjects',weekly:'Weekly plan',practice:'Practice room',report:'Learning report',profile:'My profile',resources:'Study resources',support:'Help & Support'};
+ const names:Record<string,string>={home:'My learning space',subjects:'My subjects',weekly:'Weekly plan',practice:'Practice room',report:'Learning report',profile:'My profile',resources:'Study resources',support:'Help & Support',settings:'Settings'};
  const selected=names[view]?view:'home';
+ if(selected==='settings')return <Settings student={student} state={state}/>;
  if(selected==='resources')return <StudyResources key={studentId} papers={papers} studentId={studentId}/>;
  if(selected==='support')return <HelpSupport key={studentId} studentId={studentId}/>;
  if(selected==='report')return <LearningReportOverview key={studentId} state={state} studentId={studentId}/>;

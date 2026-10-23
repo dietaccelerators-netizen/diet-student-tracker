@@ -1,10 +1,12 @@
 'use client';
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { usePortalPreferences } from './PortalPreferences';
 import styles from './StudyView.module.css';
 
 const key='mastrevo-reading-size';
 const sizes=[18,20,22,24];
 export function StudyView({children,readingOnly=false,enabled=true}:{children:ReactNode;readingOnly?:boolean;enabled?:boolean}) {
+ const {prefs,ready,update}=usePortalPreferences();
  const root=useRef<HTMLDivElement>(null);
  const toggle=useRef<HTMLButtonElement>(null);
  const [full,setFull]=useState(false);
@@ -27,7 +29,8 @@ export function StudyView({children,readingOnly=false,enabled=true}:{children:Re
   document.addEventListener('keydown',escape);
   return()=>{document.body.style.overflow=previous;siblings.forEach(e=>e.inert=false);document.removeEventListener('keydown',escape);toggle.current?.focus();};
  },[full]);
- const change=(value:string)=>{const next=Number(value);setSize(sizes.includes(next)?next:null);try{if(sizes.includes(next))localStorage.setItem(key,String(next));else localStorage.removeItem(key);}catch{}};
+ useEffect(()=>{if(ready){setSize(prefs.size);if(readingOnly&&enabled)setFull(prefs.focus);}},[ready,prefs.size,prefs.focus,readingOnly,enabled]);
+ const change=(value:string)=>{const next=Number(value);update({size:sizes.includes(next)?next:20});setSize(sizes.includes(next)?next:null);try{if(sizes.includes(next))localStorage.setItem(key,String(next));else localStorage.removeItem(key);}catch{}};
  const expand=async()=>{
   if(full){if(document.fullscreenElement===root.current)await document.exitFullscreen().catch(()=>{});setFull(false);return;}
   setFull(true);
