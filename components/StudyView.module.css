@@ -35,3 +35,5 @@
 .view.view.view .reveal{opacity:.8}.view.view.view .reveal:hover,.view.view.view .reveal:focus-visible{opacity:1}
 .view [data-reading-content] :is(button,a){scroll-margin-block:80px}
 @media(prefers-reduced-motion:reduce){.view *{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+.view[data-reading-only] :is(button,a):hover{transform:none!important}
+.view[data-reading-only] :is(button,a){transition:none!important}
