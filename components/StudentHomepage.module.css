@@ -86,10 +86,10 @@
 .home.home.home .exam strong{font-weight:700}
 .home.home.home .primary{color:#fff;font-weight:600}
 
-/* Match the user-approved screenshot's rendered fallback typography. */
-.home.home.home.home{font-family:Arial,Helvetica,sans-serif}
-.home.home.home.home :is(p,span,small,a,button,input,li,strong,b){font-family:Arial,Helvetica,sans-serif}
-.home.home.home.home :is(h1,h2,h3),.home.home.home.home .exam strong{font-family:Arial,Helvetica,sans-serif;font-weight:700;color:#08245c;letter-spacing:-.015em}
+/* Home uses the same typography and heading emphasis as the other portal sections. */
+.home.home.home.home{font-family:var(--font-source-sans),Arial,sans-serif}
+.home.home.home.home :is(p,span,small,a,button,input,li,strong,b){font-family:var(--font-source-sans),Arial,sans-serif}
+.home.home.home.home :is(h1,h2,h3),.home.home.home.home .exam strong{font-family:var(--font-space-grotesk),Arial,sans-serif;font-weight:700;color:#08245c;letter-spacing:-.02em;-webkit-text-stroke:.35px currentColor}
 .home.home.home.home p{font-weight:400;color:#08245c}
-.home.home.home.home :is(a,button) {font-weight:600}
+.home.home.home.home :is(a,button){font-weight:600}
 .home.home.home.home .primary{color:#fff}
