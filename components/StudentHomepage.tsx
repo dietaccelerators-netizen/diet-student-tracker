@@ -28,9 +28,18 @@ export function StudentHomepage({state,studentId,preview=false}:{state:TrackerSt
  useEffect(()=>{
   if(!data.ready||data.error)return;
   const ids=new Set(data.rows.filter(r=>r.status==='completed').map(r=>r.id));
-  if(seenCompletions.current&&[...ids].some(id=>!seenCompletions.current!.has(id)))setCompletion('Session complete. Your study plan is up to date.');
+  const newest=data.rows.filter(r=>r.status==='completed'&&r.finished_at).sort((a,b)=>b.finished_at!.localeCompare(a.finished_at!))[0];
+  const changed=seenCompletions.current&&[...ids].some(id=>!seenCompletions.current!.has(id));
+  let justFinished=false;
+  try {
+   const key=`mastrevo-home-completion:${studentId}`;
+   const age=newest?Date.now()-Date.parse(newest.finished_at!):Infinity;
+   justFinished=!seenCompletions.current&&age>=0&&age<120000&&sessionStorage.getItem(key)!==newest?.id;
+   if(newest&&(changed||justFinished))sessionStorage.setItem(key,newest.id);
+  } catch { /* A blocked session store must not interrupt the study overview. */ }
+  if(changed||justFinished)setCompletion('Session complete. Your study plan is up to date.');
   seenCompletions.current=ids;
- },[data.rows,data.ready,data.error]);
+ },[data.rows,data.ready,data.error,studentId]);
  useEffect(()=>{if(!completion)return;const timer=setTimeout(()=>setCompletion(''),5000);return()=>clearTimeout(timer);},[completion]);
  useEffect(()=>{
   if(!student)return;
@@ -114,7 +123,7 @@ export function StudentHomepage({state,studentId,preview=false}:{state:TrackerSt
     </section>
     <section className={styles.banner} aria-label="Discover Mastrevo" aria-roledescription="carousel">
      <Image src="/brand/home-study-books.png" alt="" fill sizes="(max-width: 900px) 100vw, 700px" className={styles.bannerPhoto}/>
-     <div className={styles.bannerCopy} role="group" aria-label={`${banner+1} of ${banners.length}`} aria-live="polite"><small>{current.label}</small><h2>{current.title}</h2><p>{current.text}</p><Link className={styles.textLink} href={href(current.url)}>{current.action} <span aria-hidden="true">→</span></Link></div>
+     <div className={styles.bannerCopy} role="group" aria-label={`${banner+1} of ${banners.length}`} aria-live="polite"><small>{current.label}</small><h2>{current.title}</h2><p>{current.text}</p><Link className={styles.textLink} href={preview&&current.url.includes('view=settings')?'/login':href(current.url)}>{preview&&current.url.includes('view=settings')?'Sign in for reading preferences':current.action} <span aria-hidden="true">→</span></Link></div>
      <div className={styles.controls}><button aria-label="Previous feature" onClick={()=>setBanner((banner+banners.length-1)%banners.length)}>←</button><span>{banner+1} / {banners.length}</span><button aria-label="Next feature" onClick={()=>setBanner((banner+1)%banners.length)}>→</button></div>
     </section>
    </div>
