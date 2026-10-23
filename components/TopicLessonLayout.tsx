@@ -2,9 +2,9 @@
 import { useTracker } from './TrackerProvider';
 import { usePortalPreferences } from './PortalPreferences';
 import { StudyView } from "./StudyView";
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { sampleLearningTopic, type AccountingBlock, type StudySection } from '@/lib/subjectLessonSample';
 import styles from './TopicLessonLayout.module.css';
 
@@ -13,7 +13,8 @@ export function TopicLessonLayout({subject,topic,backHref,subjectId,topicId,chil
  const {prefs,ready}=usePortalPreferences();
  const {currentUserId}=useTracker();
  const storageKey=`mastrevo-lesson:v1:${currentUserId||'preview'}:${subjectId}:${topicId||'sample-cgt'}`;
- const params=useSearchParams(),pathname=usePathname();
+ const params=useSearchParams(),pathname=usePathname(),router=useRouter();
+ const heading=useRef<HTMLHeadingElement>(null);
  const isSample=!topicId;
  const sections:StudySection[]=isSample?sampleLearningTopic.sections:[];
  const requested=sections.findIndex(s=>s.slug===params.get('section'));
@@ -23,10 +24,10 @@ export function TopicLessonLayout({subject,topic,backHref,subjectId,topicId,chil
  useEffect(()=>{if(ready)setReadingMode(prefs.lesson);},[ready,prefs.lesson]);
  const [completed,setCompleted]=useState<string[]>([]);
  const [loaded,setLoaded]=useState(false),[saveError,setSaveError]=useState(false);
- useEffect(()=>{try{const saved=JSON.parse(localStorage.getItem(storageKey)||'{}');setCompleted(Array.isArray(saved.completed)?saved.completed.filter((id:unknown)=>typeof id==='string'&&sections.some(s=>s.id===id)):[]);if(!params.has('section')&&typeof saved.section==='string'){const index=sections.findIndex(s=>s.slug===saved.section);if(index>=0){setSection(index);setPanel(saved.panel===1?1:0);}}}catch{setSaveError(true);}setLoaded(true);},[storageKey]);
+ useEffect(()=>{try{const saved=JSON.parse(localStorage.getItem(storageKey)||'{}');setCompleted(Array.isArray(saved.completed)?saved.completed.filter((id:unknown)=>typeof id==='string'&&sections.some(s=>s.id===id)):[]);if(!params.has('section')&&typeof saved.section==='string'){const index=sections.findIndex(s=>s.slug===saved.section);if(index>=0){setSection(index);if(!params.has('content'))setPanel(saved.panel===1?1:0);}}else if(saved.section===params.get('section')&&!params.has('content'))setPanel(saved.panel===1?1:0);}catch{setSaveError(true);}setLoaded(true);},[storageKey]);
  useEffect(()=>{if(!loaded)return;try{localStorage.setItem(storageKey,JSON.stringify({completed,section:sections[section]?.slug,panel}));}catch{setSaveError(true);}},[storageKey,loaded,completed,section,panel]);
  const current=sections[section];
- const chooseSection=(index:number)=>{setSection(index);setPanel(0);};
+ const chooseSection=(index:number)=>{setSection(index);setPanel(0);const q=new URLSearchParams(params.toString());q.set('section',sections[index].slug);q.delete('content');router.replace(pathname+'?'+q.toString(),{scroll:false});requestAnimationFrame(()=>{heading.current?.focus();heading.current?.scrollIntoView({block:'start',behavior:'instant'});});};
  const title=isSample?sampleLearningTopic.name:topic;
  const practiceParams=new URLSearchParams({view:'practice',fromLesson:'1',subject:subjectId,topic:topicId||'layout-sample',section:current?.slug||'',content:String(panel)});
  if(pathname==='/login'){practiceParams.set('mode','preview');practiceParams.set('stage',params.get('stage')||'Professional');}
@@ -39,7 +40,7 @@ export function TopicLessonLayout({subject,topic,backHref,subjectId,topicId,chil
  const done=!!current&&completed.includes(current.id);
  return <section className={styles.page} aria-label="Topic learning workspace">
   <Link className={styles.back} href={backHref}>← Back to Study Path</Link>
-  <header className={styles.header}><div><span className={styles.eyebrow}>{subject} › {title}</span><h1>{current?.title||title}</h1><p>{current?`Section ${section+1} of ${sections.length} · Estimated time: ${current.estimatedMinutes} minutes`:'Learning content awaiting publication'}</p></div>{isSample&&<span className={styles.badge}>Sample lesson</span>}</header>
+  <header className={styles.header}><div><span className={styles.eyebrow}>{subject} › {title}</span><h1 ref={heading} tabIndex={-1}>{current?.title||title}</h1><p>{current?`Section ${section+1} of ${sections.length} · Estimated time: ${current.estimatedMinutes} minutes`:'Learning content awaiting publication'}</p></div>{isSample&&<span className={styles.badge}>Sample lesson</span>}</header>
   {isSample&&<div className={styles.preview}><strong>Example from your supplied template · Advanced Taxation</strong><p>This content demonstrates the reading experience. It is not a published lesson for {subject}. Sample completion and reading position are saved in this browser only. This draft has not been verified for the current exam syllabus.</p></div>}
   {current?<div className={styles.layout}>
    <aside className={styles.outline}><h2>In this topic</h2><p>{completed.length} of {sections.length} sample sections completed</p><progress aria-label="Sample section completion" value={completed.length} max={sections.length}/><nav aria-label="Topic section navigation">{sections.map((item,i)=><button type="button" key={item.id} aria-current={section===i?'step':undefined} onClick={()=>chooseSection(i)}><span className={styles.step} data-complete={completed.includes(item.id)||undefined}>{completed.includes(item.id)?'✓':String(i+1).padStart(2,'0')}</span><span>{item.title}<small>{item.estimatedMinutes} min · {completed.includes(item.id)?'Complete':section===i?'Current section':'Upcoming'}</small></span></button>)}</nav></aside>
@@ -68,7 +69,7 @@ export function TopicLessonLayout({subject,topic,backHref,subjectId,topicId,chil
      {panel===2&&<><h3>Key Points</h3>{current.keyPoints.length?<ol className={styles.lessonList}>{current.keyPoints.map(item=><li key={item}>{item}</li>)}</ol>:<p>Key points have not been added for this section yet.</p>}</>}
      {panel===3&&<><h3>Worked Examples</h3>{current.workedExamples.length?current.workedExamples.map(example=><section className={styles.example} key={example.id}><h4>{example.title}</h4><p>{example.scenario}</p><h4>Step-by-step solution</h4><ol className={styles.lessonList}>{example.solution.map(step=><li key={step}>{step}</li>)}</ol></section>):<p>No worked examples have been added for this section yet.</p>}</>}
     </article></StudyView>
-    <div className={styles.controls}><button disabled={section===0} onClick={()=>chooseSection(section-1)}>← Previous section</button><button disabled={section===sections.length-1} onClick={()=>chooseSection(section+1)}>Next section →</button></div>
+    {panel!==1&&<div className={styles.controls}><button disabled={section===0} onClick={()=>chooseSection(section-1)}>← Previous section</button><button disabled={section===sections.length-1} onClick={()=>chooseSection(section+1)}>Next section →</button></div>}
 
    </div>
   </div>:<section className={styles.handoff}><h3>Lesson sections are not published yet</h3><p>Your saved topic updates remain available below. Standard and Simplified will be two reading modes for the same lesson once content is published.</p><Link className="mv-button mv-button-outline" href={backHref+(backHref.includes('?')?'&':'?')+'lessonLayout=sample'}>Preview the learning experience →</Link></section>}
