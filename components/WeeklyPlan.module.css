@@ -81,3 +81,6 @@
 .page.page.page :is(p,dt,dd,label,legend,.hint,.time,.stats small){color:#08245c}
 .page.page.page :is(strong,b){font-weight:600}
 .page.page.page .stats strong{font-weight:700}
+
+/* Subject identity follows the shared bookshelf icon mapping. */
+.subjectCode{display:flex;flex-direction:column;align-items:center;gap:6px}.subjectCode svg{width:20px;height:20px;flex-shrink:0}

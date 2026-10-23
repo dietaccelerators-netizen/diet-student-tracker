@@ -40,3 +40,5 @@
 .page.page.page :is(p,label,.small,.meta,.heroMeta,.eyebrow){color:#08245c}
 .page.page.page :is(strong,b){font-weight:600;color:#08245c}
 .page.page.page .timerDisplay small{font-weight:400;-webkit-text-stroke:0}
+
+.subjectLabel{display:flex;align-items:center;gap:8px}.subjectLabel svg{width:18px;height:18px;flex-shrink:0;color:#0759e6}

@@ -12,34 +12,34 @@ export function StudentSubjects({state,studentId,preview=false,managePapers}:{st
  const student=getStudent(state,studentId);
  if(!student)return <p>Your profile could not be loaded. Please sign in again.</p>;
  const stage=stageFor(student.level)??student.level;
- const papers=getStudentPapers(state,studentId), progress=getStudentProgress(state,studentId);
+ const papers=getStudentPapers(state,studentId),progress=getStudentProgress(state,studentId);
  const base=`/login?mode=preview&stage=${encodeURIComponent(stage)}`;
  const subjectHref=(id:string,topic?:string)=>preview?`${base}&subject=${encodeURIComponent(id)}${topic?'&lesson='+encodeURIComponent(topic):''}`:`/papers/${encodeURIComponent(id)}${topic?'?lesson='+encodeURIComponent(topic):''}`;
- const recentRecords=[...progress].filter(p=>p.lastStudied).sort((a,b)=>(b.lastStudied||'').localeCompare(a.lastStudied||'')||b.updatedAt.localeCompare(a.updatedAt));
+ const recentRecords=progress.filter(p=>(p.lastStudied||p.status!=='Not Started'||p.questionPractice!=='Not Yet')&&state.topics.some(t=>t.id===p.topicId&&papers.some(paper=>paper.id===t.paperId))).sort((a,b)=>(b.lastStudied||b.updatedAt).localeCompare(a.lastStudied||a.updatedAt)||b.updatedAt.localeCompare(a.updatedAt));
  const cards=papers.map(paper=>{
   const topics=state.topics.filter(t=>t.paperId===paper.id).sort((a,b)=>a.displayOrder-b.displayOrder);
   const record=recentRecords.find(p=>topics.some(t=>t.id===p.topicId));
-  const current=topics.find(t=>t.id===record?.topicId)||topics.find(t=>progress.some(p=>p.topicId===t.id&&p.status==='Learning'))||topics[0];
-  const next=current?topics[topics.indexOf(current)+1]:undefined;
-  return {paper,topics,record,current,next};
+  const current=topics.find(t=>t.id===record?.topicId)||topics[0];
+  const confident=topics.filter(t=>progress.some(p=>p.topicId===t.id&&p.status==='Okay')).length;
+  return {paper,topics,record,current,confident};
  });
- const recent=recentRecords[0],resume=cards.find(c=>c.topics.some(t=>t.id===recent?.topicId));
- const resumeTopic=resume?.topics.find(t=>t.id===recent?.topicId);
+ const recent=recentRecords[0],resume=cards.find(c=>c.current?.id===recent?.topicId);
  const search=query.trim().toLowerCase();
  const filtered=cards.filter(c=>`${c.paper.name} ${c.paper.code} ${c.topics.map(t=>t.topicName).join(' ')}`.toLowerCase().includes(search));
- const lastDate=recent?.lastStudied?new Date(`${recent.lastStudied}T12:00:00Z`):null;
+ const lastDate=recent?.lastStudied?new Date(`${recent.lastStudied.slice(0,10)}T12:00:00Z`):null;
  return <section className={styles.page} aria-label="My subjects">
-  <header className={styles.header}><div><h1>Continue your learning</h1><p>Pick up where you left off and keep making progress.</p></div><Link className={styles.avatar} href={preview?'/login':'/dashboard?view=profile'} aria-label="Open my profile">{student.fullName.split(' ').map(n=>n[0]).slice(0,2).join('')}</Link></header>
-  <section className={styles.resume} aria-label="Continue where you stopped"><div><span className={styles.eyebrow}>{resumeTopic?'CONTINUE WHERE YOU STOPPED':'READY WHEN YOU ARE'}</span><h2>{resumeTopic?resume!.paper.name:'Your next study session starts here'}</h2><p>{resumeTopic?.topicName||'Choose one of your registered subjects below.'}</p>{lastDate&&Number.isFinite(lastDate.getTime())&&<small>Last recorded study · {lastDate.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'})}</small>}</div><Link className={styles.primary} href={resumeTopic?subjectHref(resume!.paper.id,resumeTopic.id):'#subject-catalogue'}>{resumeTopic?'Continue':'View my subjects'} <span aria-hidden="true">→</span></Link></section>
-  <section id="subject-catalogue" aria-label="Registered subjects"><div className={styles.toolbar}><label className={styles.search}><span>Search your subjects</span><input type="search" placeholder="Subject name, code or topic" value={query} onChange={e=>setQuery(e.target.value)}/></label><div className={styles.manage}><span>{papers.length} registered {papers.length===1?'subject':'subjects'}</span>{managePapers}</div></div>
+  <header className={styles.header}><h1>Continue Learning</h1><div className={styles.manage}>{managePapers||<Link className={styles.manageLink} href={preview?'/login':'/dashboard?view=profile'}>{preview?'Sign in to manage papers':'Manage papers'} <span aria-hidden="true">→</span></Link>}</div></header>
+  {resume?.current&&<section className={styles.resume} aria-label="Continue where you stopped"><div><span className={styles.eyebrow}>CONTINUE WHERE YOU STOPPED</span><h2>{resume.paper.name}</h2><p>{resume.current.topicName}</p>{lastDate&&Number.isFinite(lastDate.getTime())&&<small>Last recorded study · {lastDate.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'})}</small>}</div><Link className={styles.primary} href={subjectHref(resume.paper.id,resume.current.id)}>Resume topic <span aria-hidden="true">→</span></Link></section>}
+  <section aria-label="Registered subjects"><div className={styles.toolbar}><label className={styles.search}><span>Find a subject or topic</span><input type="search" placeholder="Search by name, code or topic" value={query} onChange={e=>setQuery(e.target.value)}/></label><span className={styles.count}>{papers.length} registered {papers.length===1?'subject':'subjects'}</span></div>
   {query&&<p className={styles.results} role="status">{filtered.length} {filtered.length===1?'subject':'subjects'} found <button onClick={()=>setQuery('')}>Clear search</button></p>}
-  <div className={styles.grid}>{filtered.map(({paper,topics,current,next,record})=><article className={styles.card} key={paper.id}>
-   <div className={styles.imageSlot}><PortalArtwork kind={subjectIcon(paper.name)} compact/><span className="mv-art-code">{paper.code}</span></div>
-   <div className={styles.cardBody}><span className={styles.code}>{paper.code}</span><h2>{paper.name}</h2><div className={styles.coverage}><span>Syllabus coverage</span><strong>Not yet measured</strong></div><div className={styles.progressPlaceholder} aria-hidden="true"/>
-   <dl><div><dt>{record?'Current topic':current?'Start with':'Current topic'}</dt><dd>{current?.topicName||'Topic list awaiting publication'}</dd></div><div><dt>Next topic</dt><dd>{next?.topicName||(topics.length?'End of the current topic list':'Available when topics are published')}</dd></div></dl>
-   <Link className={styles.continue} href={subjectHref(paper.id)} aria-label={`${current?'Continue':'Open'} ${paper.name}`}>{current?'Continue':'Open subject'} <span aria-hidden="true">→</span></Link></div>
+  <div className={styles.grid}>{filtered.map(({paper,topics,current,record,confident})=><article className={styles.card} key={paper.id}>
+   <div className={styles.identity}><div className={styles.art}><PortalArtwork kind={subjectIcon(paper.name)} compact/></div><div className={styles.title}><span className={styles.code}>{paper.code}</span><h2>{paper.name}</h2></div></div>
+   <div className={styles.cardBody}>
+    {current?<><div className={styles.topic}><span>{record?'Current topic':'Start with'}</span><h3>{current.topicName}</h3></div>{record?<div className={styles.progress}><div><span>Marked confident</span><strong>{confident} / {topics.length} topics</strong></div><meter min={0} max={topics.length} value={confident} aria-label={`${confident} of ${topics.length} topics marked confident by you`}/><small>Your own assessment, not a test score.</small></div>:<p className={styles.available}>{topics.length} {topics.length===1?'topic':'topics'} to explore</p>}</>:<p className={styles.availability}>Topics are being prepared. They’ll appear here once published.</p>}
+    <Link className={styles.continue} href={subjectHref(paper.id,current?.id)} aria-label={`${record?'Resume':current?'Start':'Open'} ${paper.name}${current?` — ${current.topicName}`:''}`}>{record?'Resume topic':current?'Start topic':'Open subject'} <span aria-hidden="true">→</span></Link>
+   </div>
   </article>)}</div>
-  {!filtered.length&&<div className={styles.empty}><h2>{papers.length?'No matching subjects':'No subjects selected yet'}</h2><p>{papers.length?'Try another subject name, code or topic.':'Choose your registered papers using Manage papers.'}</p>{query&&<button onClick={()=>setQuery('')}>Clear search</button>}</div>}
-  <p className={styles.footnote}>Only your selected papers appear here. Coverage will be available when lesson sections are published.</p></section>
+  {!filtered.length&&<div className={styles.empty}><h2>{papers.length?'No matching subjects':'Your bookshelf starts here'}</h2><p>{papers.length?'Try another subject name, code or topic.':preview?'Sign in to choose your papers.':'Use Manage papers above to select the subjects you’re preparing for.'}</p>{query&&<button onClick={()=>setQuery('')}>Clear search</button>}</div>}
+  </section>
  </section>;
 }
