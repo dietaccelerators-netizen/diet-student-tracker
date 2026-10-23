@@ -1,5 +1,5 @@
 import { createClient } from './supabase/client';
-export interface StudyBlock { date: string; paperId: string; start: string; end: string; duration: number }
+export interface StudyBlock { date: string; paperId: string; start: string; end: string; duration: number; sourceKey?: string }
 export type SessionStatus = 'running' | 'paused' | 'completed' | 'partial';
 export interface StudySession {
   id: string; user_id: string; stage: string; block_key: string; plan_date: string;
@@ -7,7 +7,7 @@ export interface StudySession {
   status: SessionStatus; elapsed_seconds: number; running_since: string | null;
   started_at: string; finished_at: string | null; notes: string; revision: number;
 }
-export const blockKey = (s: StudyBlock) => `${s.date}:${s.paperId}:${s.start}`;
+export const blockKey = (s: StudyBlock) => s.sourceKey || `${s.date}:${s.paperId}:${s.start}`;
 export const isOpen = (s: StudySession) => s.status === 'running' || s.status === 'paused';
 export function elapsed(s: StudySession, now = Date.now()): number {
   return Math.min(86400, s.elapsed_seconds + (s.status === 'running' && s.running_since ? Math.max(0, Math.floor((now - Date.parse(s.running_since)) / 1000)) : 0));
@@ -49,4 +49,11 @@ export async function saveSession(next:StudySession,previous:StudySession|null,p
   if(error?.code==='23505'||(!error&&!data))throw new Error(conflict);
   if(error||!data)throw new Error('Session changes were not saved. Check your connection and retry.');
   return data;
+}
+
+export async function loadSessionForBlock(user:string,stage:string,key:string,preview:boolean):Promise<StudySession|null> {
+ if(preview)return previewRows(user,stage).find(s=>s.block_key===key)||null;
+ const {data,error}=await createClient().from('study_session_logs').select('*').eq('user_id',user).eq('stage',stage).eq('block_key',key).maybeSingle();
+ if(error)throw new Error('Session activity could not be checked. Please try again.');
+ return data;
 }

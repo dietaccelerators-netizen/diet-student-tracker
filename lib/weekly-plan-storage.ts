@@ -1,12 +1,14 @@
 import { createClient } from './supabase/client';
 import { parseDraft, type PlanDraft } from './plan-setup';
+import { validMove, type SessionMove } from './plan-schedule';
 
-export interface ActivePlan { version: 1; draft: PlanDraft; paperIds: string[]; savedAt: string }
+export interface ActivePlan { version: 1; draft: PlanDraft; paperIds: string[]; savedAt: string; moves?: SessionMove[] }
 export interface PlanAccount { draft: PlanDraft | null; active: ActivePlan | null; revision: number; updatedAt: string | null }
 export const emptyAccount = (): PlanAccount => ({ draft: null, active: null, revision: 0, updatedAt: null });
 export function parseActive(value: unknown): ActivePlan | null {
   if (!value || typeof value !== 'object') return null;
   const p = value as ActivePlan, draft = parseDraft(p.draft);
+  if(p.moves!==undefined&&(!Array.isArray(p.moves)||p.moves.length>250||!p.moves.every(validMove)||new Set(p.moves.map(m=>`${m.source.date}:${m.source.paperId}:${m.source.start}`)).size!==p.moves.length))return null;
   return p.version === 1 && draft && Array.isArray(p.paperIds) && p.paperIds.every(id => typeof id === 'string') && typeof p.savedAt === 'string' && Number.isFinite(Date.parse(p.savedAt)) ? { ...p, draft } : null;
 }
 function parseAccount(row: { draft: unknown; active_plan: unknown; revision: number; updated_at: string }): PlanAccount {
