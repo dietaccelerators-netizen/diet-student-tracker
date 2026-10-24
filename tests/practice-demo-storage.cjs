@@ -1,0 +1,14 @@
+const fs=require('node:fs'),ts=require('typescript'),assert=require('node:assert/strict');
+require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,f);
+const {parseObjectiveDemo,readObjectiveDemo,objectiveKey}=require('../lib/practice-demo-storage.ts');
+const saved={version:1,phase:'active',mode:'timed',minutes:5,ids:['equation','credit'],answers:{equation:1},flags:['credit'],index:1,deadline:1700000000000,expired:false};
+assert.deepEqual(parseObjectiveDemo(saved),saved);
+for(const patch of [{ids:['unknown']},{ids:['equation','equation']},{index:2},{answers:{equation:4}},{answers:{unknown:0}},{flags:['unknown']},{deadline:null},{minutes:3},{phase:'bad'}])assert.equal(parseObjectiveDemo({...saved,...patch}),null);
+assert(parseObjectiveDemo({...saved,mode:'practice',deadline:null}));
+assert.equal(parseObjectiveDemo(null),null);
+const store=new Map();global.localStorage={getItem:k=>store.get(k)||null};
+assert.equal(readObjectiveDemo('a'),null);store.set(objectiveKey('a'),JSON.stringify(saved));
+assert.deepEqual(readObjectiveDemo('a'),saved);assert.equal(readObjectiveDemo('b'),null);
+assert.equal(readObjectiveDemo('a').deadline,saved.deadline,'reload must not restart timer');
+store.set(objectiveKey('a'),'broken');assert.throws(()=>readObjectiveDemo('a'));
+console.log('Practice persistence checks passed: answers, position, fixed deadline, student isolation and corrupt state.');
