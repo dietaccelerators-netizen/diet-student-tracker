@@ -42,7 +42,7 @@ function WeeklyPlanContent({student,papers,preview}: {student:Profile;papers:Pap
   useEffect(()=>{if(moving)moveDialog.current?.showModal();else moveDialog.current?.close();},[moving]);
   useLayoutEffect(()=>{
     const nodes=listRef.current?.querySelectorAll<HTMLElement>('[data-session-key]');
-    nodes?.forEach(node=>{const key=node.dataset.sessionKey!,rect=node.getBoundingClientRect(),old=positions.current.get(key);if(old&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&(old.top!==rect.top||old.left!==rect.left))node.animate([{transform:`translate(${old.left-rect.left}px,${old.top-rect.top}px)`},{transform:'translate(0,0)'}],{duration:220,easing:'ease-out'});});
+    nodes?.forEach(node=>{const key=node.dataset.sessionKey!,rect=node.getBoundingClientRect(),old=positions.current.get(key);if(old&&document.documentElement.dataset.reduceMotion!=='true'&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&(old.top!==rect.top||old.left!==rect.left))node.animate([{transform:`translate(${old.left-rect.left}px,${old.top-rect.top}px)`},{transform:'translate(0,0)'}],{duration:220,easing:'ease-out'});});
     positions.current.clear();
   },[plan,filter,selectedDay]);
   const [activity,setActivity]=useState<{week:string;rows:StudySession[];ready:boolean}>({week:'',rows:[],ready:false});

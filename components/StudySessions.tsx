@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { blockKey, elapsed, isOpen, loadSessions, saveSession, timerText, transition, type StudyBlock, type StudySession } from '@/lib/study-sessions';
 import type { Paper, Profile } from '@/lib/types';
 import styles from './StudySessions.module.css';
@@ -13,7 +14,7 @@ export function StudySessions({student,papers,week,end,selected,preview,onClose,
     loadSessions(student.id,student.level,week,end,preview).then(data=>{if(!cancelled){setRows(data);setLoading(false);}}).catch(e=>{if(!cancelled){setError(e.message);setLoading(false);}});
     return()=>{cancelled=true;};
   },[student.id,student.level,week,end,preview,reload]);
-  useEffect(()=>{if(selected)target.current?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});},[selected]);
+  useEffect(()=>{if(selected)target.current?.scrollIntoView({behavior:(document.documentElement.dataset.reduceMotion==='true'||matchMedia('(prefers-reduced-motion: reduce)').matches)?'instant':'smooth',block:'start'});},[selected]);
   useEffect(()=>{onActivity?.(rows,!loading&&!error);},[rows,loading,error,onActivity]);
   const active=rows.find(isOpen);
   const current=selected?rows.find(s=>s.block_key===blockKey(selected)):active;
@@ -63,6 +64,7 @@ function SessionPanel({row,block,student,paperName,preview,save,onClose,onReload
     <p className={styles.timer} role="timer" aria-label="Elapsed study time">{timerText(seconds)}</p>
     <p className={styles.muted}>{preview?'Preview activity stays on this browser.':'Session changes are saved to your account.'} The timer continues until paused, including while you leave this page. Review the time before saving your result. Timers are capped at 24 hours.</p>
     {finished?<div className={styles.notice}><b>{row.status==='completed'?'Completed':'Partly completed'}</b><p>{row.notes||'Your study time and result have been saved.'}</p><p>Completing a session does not automatically mark a syllabus topic as mastered.</p></div>:review?<fieldset disabled={busy}><legend>Finish this session</legend><label>Actual study time (minutes)<input type="number" min="0" max="1440" step="0.1" value={minutes} onChange={e=>setMinutes(e.target.value)}/></label><label>Session result<select value={outcome} onChange={e=>setOutcome(e.target.value as 'completed'|'partial')}><option value="completed">Completed my goal</option><option value="partial">Partly completed</option></select></label><label>Notes or what to revisit (optional)<textarea maxLength={2000} value={notes} onChange={e=>setNotes(e.target.value)}/></label><div className={styles.actions}><button onClick={()=>setReview(false)}>Back to paused session</button><button className={styles.primary} onClick={()=>perform('finish')}>Save session result</button></div></fieldset>:<div className={styles.actions}>{!row?<button className={styles.primary} disabled={busy||!goal.trim()} onClick={()=>perform('start')}>Start study session</button>:<><button disabled={busy} className={styles.primary} onClick={()=>perform(row.status==='running'?'pause':'resume')}>{row.status==='running'?'Pause session':'Resume session'}</button><button disabled={busy} onClick={()=>perform('review')}>Finish session</button></>}</div>}
+    {row&&isOpen(row)&&<p><Link href={preview?`/login?mode=preview&stage=${encodeURIComponent(student.level)}&subject=${encodeURIComponent(row.paper_id)}`:`/papers/${encodeURIComponent(row.paper_id)}`}>Open study content →</Link></p>}
     {busy&&<p role="status">Saving session…</p>}{error&&<div role="alert"><p>{error}</p><button disabled={busy} onClick={onReload}>Reload sessions</button></div>}
   </div>;
 }
