@@ -787,3 +787,5 @@ main:has(.da-home, [aria-label="My subjects"], [aria-label="Subject workspace"],
 
 /* Explicit text families prevent legacy reading styles overriding inheritance. */
 :is([aria-label="My subjects"],[aria-label="Subject workspace"],[aria-label="Topic learning workspace"]):is([aria-label="My subjects"],[aria-label="Subject workspace"],[aria-label="Topic learning workspace"]) :is(p,li,dd,dt,span,small,strong,b,label,input,select,a,button,th,td,caption){font-family:var(--font-source-sans),Arial,sans-serif}
+
+.quiz-demo-controls{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px}.quiz-demo-controls>span{font-size:14px;color:#52647d}.quiz-question{animation:practice-question-enter .16s ease-out}.quiz-question legend:focus{outline:none}@keyframes practice-question-enter{from{opacity:.65;transform:translateY(2px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion:reduce){.quiz-question{animation:none}}
