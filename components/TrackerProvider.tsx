@@ -1,5 +1,6 @@
 "use client";
 
+import { PreferencesProvider } from './PortalPreferences';
 import {
   createContext,
   useCallback,
@@ -277,7 +278,7 @@ export function TrackerProvider({
 
   return (
     <TrackerContext.Provider value={value}>
-      {children}
+      <PreferencesProvider key={`${backend}:${currentUserId}`} userId={currentUserId} backend={backend}>{children}</PreferencesProvider>
       {syncError && (
         <div className="fixed bottom-4 left-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-lg border border-[#E7D6D0] bg-[#FFF9F7] px-4 py-3 text-sm text-[#7F4A3D] shadow-[0_10px_30px_rgba(32,38,43,0.12)]" role="alert">
           We could not save the latest change. Please check your connection and try again.
