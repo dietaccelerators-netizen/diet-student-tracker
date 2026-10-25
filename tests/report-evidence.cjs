@@ -1,0 +1,11 @@
+const fs=require('node:fs'),ts=require('typescript'),assert=require('node:assert/strict');
+require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,f);
+const {DAY,hasTopicEvidence,reportTopics,reviewTopics,reportSessions,studyTime}=require('../lib/report-evidence.ts');
+const progress={id:'p',studentId:'u',topicId:'a',status:'Not Started',questionPractice:'Not Yet',lastStudied:null,nextStep:'',updatedAt:'',thisWeek:false};
+assert(!hasTopicEvidence(progress));assert(!hasTopicEvidence({...progress,thisWeek:true}));assert(hasTopicEvidence({...progress,nextStep:'Review working'}));
+const state={topics:[{id:'a',paperId:'p',displayOrder:2},{id:'b',paperId:'p',displayOrder:1},{id:'c',paperId:'removed',displayOrder:0}],progress:[{...progress,status:'Needs Practice'},{...progress,id:'q',topicId:'b',questionPractice:'Reattempt'},{...progress,id:'r',studentId:'other',topicId:'c',status:'Needs Practice'}]};
+const topics=reportTopics(state,'u',['p']);assert.equal(topics.length,2);assert.deepEqual(reviewTopics(topics).map(t=>t.id),['b','a']);
+const now=Date.parse('2026-10-25T12:00:00Z'),row={id:'1',user_id:'u',stage:'Skills',paper_id:'p',status:'completed',finished_at:new Date(now-DAY).toISOString(),elapsed_seconds:600};
+const rows=[row,row,{...row,id:'2',status:'partial',elapsed_seconds:300},{...row,id:'3',status:'running'},{...row,id:'4',user_id:'other'},{...row,id:'5',stage:'ATS 1'},{...row,id:'6',paper_id:'removed'},{...row,id:'7',elapsed_seconds:-5},{...row,id:'8',finished_at:new Date(now-7*DAY).toISOString()},{...row,id:'9',finished_at:new Date(now+1).toISOString()},{...row,id:'10',finished_at:'invalid'}];
+const result=reportSessions(rows,'u','Skills',['p'],7,now);assert.equal(result.current.length,2);assert.equal(result.seconds,900);assert.equal(result.completed,1);assert.equal(result.previous.length,1,'boundary belongs to previous period');assert.equal(result.previousSeconds,600);assert.equal(studyTime(3900),'1h 5m');assert.equal(studyTime(0),'0 min');
+console.log('Report evidence checks passed: defaults, explicit flags, stable order, scope, duplicate exclusion, time windows and partial sessions.');
