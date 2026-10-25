@@ -58,7 +58,7 @@ const helpTopics: HelpTopic[] = [
             {
                 id: "subjects-1",
                 title: "How Standard and Simplified modes work",
-                answer: "Standard and Simplified are two reading versions of the same lesson. Standard keeps the fuller technical explanation, while Simplified presents the same concept in clearer language. Switching modes does not create separate progress.",
+                answer: "Where both versions are published, Standard provides the fuller technical explanation and Simplified uses plainer language. Switching modes does not create separate progress. Report a missing technical point to support; do not assume unpublished versions are available.",
             },
             {
                 id: "subjects-2",
@@ -68,7 +68,7 @@ const helpTopics: HelpTopic[] = [
             {
                 id: "subjects-3",
                 title: "Where past questions went",
-                answer: "Open Practice Room for Quick Review, Past Questions and Exam Focus. The current question collection is a clearly labelled sample; availability depends on the selected paper.",
+                answer: "Open Practice Room to see the available formats. The optional guided demo contains sample questions; it is separate from your account work. Activities marked as forthcoming are not ready to start.",
             },
             {
                 id: "subjects-4",
@@ -101,7 +101,7 @@ const helpTopics: HelpTopic[] = [
             {
                 id: "weekly-4",
                 title: "Where to log lectures",
-                answer: "Lecture attendance and lecture coverage should be recorded under Weekly Plan → Lectures. This helps the portal distinguish lecture exposure from personal mastery.",
+                answer: "Weekly Plan can reserve lecture times. Lecture attendance logging and post-lecture checks are not connected yet; a reserved lecture time is not evidence of completion or mastery.",
             },
         ],
     },
@@ -114,7 +114,7 @@ const helpTopics: HelpTopic[] = [
             {
                 id: "practice-1",
                 title: "Can I answer questions on paper?",
-                answer: "Yes. For longer written, calculation and professional questions, select Answer on Paper. Complete the question physically, return to the portal, review the suggested solution and marking guide, then record your score.",
+                answer: "In the guided written-practice demo, choose Answer on paper, complete your work, then review the marking guide and assess your response. This is self-assessment, not an automatically awarded exam score.",
             },
             {
                 id: "practice-2",
@@ -136,23 +136,23 @@ const helpTopics: HelpTopic[] = [
     {
         id: "learning-report",
         title: "Learning Report",
-        description: "Understand coverage, mastery, weak areas and next steps.",
+        description: "Understand recorded activity, topic flags and useful next steps.",
         icon: "report",
         articles: [
             {
                 id: "report-1",
                 title: "Why is coverage different from mastery?",
-                answer: "Coverage describes completed syllabus sections. Mastery needs reliable evidence of understanding. Account-wide completion and scored attempts are not connected yet, so unavailable metrics display a dash. Sample view is illustrative.",
+                answer: "Topic updates describe the progress you record. Finished study sessions provide study-time evidence. These do not establish mastery or predict a pass. Mastery and exam-readiness scores are deferred until reliable evidence is connected.",
             },
             {
                 id: "report-2",
                 title: "How are weak areas identified?",
-                answer: "My report currently shows topics you marked Needs Practice or requested to reattempt. These are self-reported flags, not a score-based diagnosis. Sample view illustrates future performance patterns.",
+                answer: "Learning Report identifies topics you marked Needs Practice or requested to reattempt. These are your recorded flags, not a score-based diagnosis. Open the relevant topic to revise or practise when content is available.",
             },
             {
                 id: "report-3",
                 title: "How does Send to Weekly Plan work?",
-                answer: "Use Next Steps to decide what to work on and open Weekly Plan to schedule it yourself. Automatic transfer is not connected, and sample recommendations do not create sessions.",
+                answer: "Open the relevant topic from Learning Report or use Weekly Plan to schedule study. Report findings do not automatically create or move sessions.",
             },
             {
                 id: "report-4",
@@ -170,12 +170,12 @@ const helpTopics: HelpTopic[] = [
             {
                 id: "technical-1",
                 title: "I cannot sign in",
-                answer: "Use the email address approved for your account and request a sign-in link on the login page. Check your spam folder and use the newest link. Contact your Mastrevo coordinator if access still fails. Never share your sign-in link.",
+                answer: "Use your registered email on the sign-in page. If your password is not working, use the password reset option or request a sign-in link. Check spam, use the newest link and open it in the browser where you requested it. Never share passwords or sign-in links.",
             },
             {
                 id: "technical-2",
                 title: "A page is not loading correctly",
-                answer: "Refresh the page after saving any work. If the problem continues, prepare a problem report below with the page name, what you tried and what happened. Support delivery is not connected yet; share the draft with your coordinator through your usual contact channel.",
+                answer: "Refresh the page after saving any work. If the problem continues, prepare a problem report below with the page name, what you tried and what happened. Saving a draft does not send it. Use the verified contact route shown on this page when it is available.",
             },
             {
                 id: "technical-3",
@@ -185,7 +185,7 @@ const helpTopics: HelpTopic[] = [
             {
                 id: "technical-4",
                 title: "A resource will not open",
-                answer: "Retry the resource from Study Resources. If it still fails, note its title and prepare a problem report. Share it with your coordinator through your usual contact channel.",
+                answer: "Retry the resource from Study Resources. If it still fails, note its title and prepare a problem report. Use the contact route shown on this page when available; saving a draft alone does not contact the team.",
             },
         ],
     },
@@ -194,10 +194,13 @@ export /* ======================================================================
    FREQUENTLY ASKED QUESTIONS
 ============================================================================= */
 const faqs: FAQ[] = [
+    {id:'faq-login',question:'I cannot sign in',answer:'Use your registered email. On the sign-in page, choose password reset or request a sign-in link. Check spam and use the newest link in the browser where you requested it. Never send your password or sign-in link to support.',topic:'account-technical',keywords:['login','password','sign in','access']},
+    {id:'faq-unavailable',question:'Why is study content unavailable?',answer:'A registered paper may appear before its lessons or resources are published. An availability message is not a loading error. Check the paper and topic name; if you expected access, include those names in your support message. Sample resources do not imply a published downloadable file.',topic:'my-subjects',keywords:['unavailable','content','lesson','missing','published']},
+    {id:'faq-progress',question:'Where is my saved progress?',answer:'Check that you are signed into the same account and that the paper is selected in Manage papers. Account topic updates differ from browser-only reading position, support drafts and sample practice attempts. If a save error appeared, retry the change. Do not clear browser data while investigating missing local work.',topic:'account-technical',keywords:['saved','progress','lost','sync','browser']},
     {
         id: "faq-coverage",
-        question: "Why is my syllabus coverage different from my mastery score?",
-        answer: "Coverage describes completed material; mastery requires demonstrated understanding. Current account metrics remain unavailable until their evidence is connected. Sample view figures are examples, not your scores.",
+        question: "What does Learning Report actually measure?",
+        answer: "Learning Report uses recorded topic updates and finished study sessions. A topic flag or time spent studying is not a mastery score. Exam-readiness scoring remains unavailable; the report does not predict a pass.",
         topic: "learning-report",
         keywords: [
             "coverage",
@@ -209,7 +212,7 @@ const faqs: FAQ[] = [
     {
         id: "faq-missed-session",
         question: "What happens if I miss a planned study session?",
-        answer: "Review unfinished work in Weekly Plan and adjust your next week. Check and save changes rather than assuming the session has been moved automatically.",
+        answer: "Find the session in Weekly Plan and choose Move session to select a new day and start time. Check the saved result; missed sessions are not moved automatically.",
         topic: "weekly-plan",
         keywords: [
             "missed session",
@@ -221,7 +224,7 @@ const faqs: FAQ[] = [
     {
         id: "faq-simplified",
         question: "How do Standard and Simplified lesson modes work?",
-        answer: "Both modes contain the same learning objective. Standard preserves the fuller technical explanation while Simplified presents the same concept more plainly. Changing modes does not create duplicate lesson progress.",
+        answer: "Where published, Standard and Simplified are alternative versions of a lesson. Standard offers the fuller technical explanation and Simplified uses plainer language. Changing modes does not create duplicate progress. Report any missing technical point.",
         topic: "my-subjects",
         keywords: [
             "standard",
@@ -233,7 +236,7 @@ const faqs: FAQ[] = [
     {
         id: "faq-paper",
         question: "Can I answer Practice Room questions on paper?",
-        answer: "Yes. For longer written and calculation questions, select Answer on Paper. When you finish, return to the portal, review the suggested solution and marking guide, then self-mark your attempt.",
+        answer: "In the guided written-practice demo, select Answer on paper. Review the marking guide when you finish and assess your own response. Sample attempts remain separate from account-wide scored results.",
         topic: "practice-room",
         keywords: [
             "paper",
