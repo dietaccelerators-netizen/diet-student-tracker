@@ -35,7 +35,7 @@ export function SubjectLearning({paper,topics,progress,level,backHref,onUpdate,p
    </div>
   </header>
 
-  <nav className={styles.tabs} aria-label="Subject sections"><Link aria-current={tab==='path'?'page':undefined} href={tabHref('path')}>Study Path</Link><Link aria-current={tab==='syllabus'?'page':undefined} href={tabHref('syllabus')}>Syllabus</Link>{!preview&&<Link className={styles.resources} href={`/dashboard?view=resources&subject=${encodeURIComponent(paper.id)}`}>Additional resources →</Link>}</nav>
+  <nav data-motion="tabs" className={styles.tabs} aria-label="Subject sections"><Link aria-current={tab==='path'?'page':undefined} href={tabHref('path')}>Study Path</Link><Link aria-current={tab==='syllabus'?'page':undefined} href={tabHref('syllabus')}>Syllabus</Link>{!preview&&<Link className={styles.resources} href={`/dashboard?view=resources&subject=${encodeURIComponent(paper.id)}`}>Additional resources →</Link>}</nav>
   <SubjectSyllabus subjectId={paper.id} key={paper.id+'-'+tab+'-'+(params.get('area')||'')} view={tab} topics={ordered} progress={records} lessonHref={lessonHref} pathHref={tabHref('path')} syllabusHref={tabHref('syllabus')} selectedArea={params.get('area')}/>
   {preview&&<p className={styles.notice}>Preview · Sample topic records. Changes are temporary.</p>}
  </section>;
