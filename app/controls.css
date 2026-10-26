@@ -1,0 +1,71 @@
+/* Shared control contract. Page typography remains owned by each section. */
+:root {
+  --ui-primary: #0759e6;
+  --ui-primary-hover: #0849bc;
+  --ui-primary-pressed: #073a94;
+  --ui-focus: #0759e6;
+  --ui-button-height: 44px;
+  --ui-button-radius: 10px;
+  --ui-button-gap: 8px;
+  --ui-card-radius: 14px;
+  --ui-card-border: #d8e5f5;
+  --ui-card-padding: 20px;
+}
+/* Geometry and interaction states intentionally override legacy module variants. */
+button, [data-ui] { -webkit-tap-highlight-color: transparent; }
+button { min-height: 44px !important; min-width: 44px !important; }
+select, input:not([type="checkbox"]):not([type="radio"]):not([type="range"]) { min-height: 44px; }
+.nav-item { min-height: 44px; }
+.nav-item svg { width: 20px; height: 20px; stroke-width: 1.7; }
+button, a, input, select, textarea, summary { scroll-margin-block: 96px; }
+:is(button, a, input, select, textarea, summary):focus-visible {
+  outline: 3px solid var(--ui-focus) !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 2px #fff !important;
+}
+:is(button, [data-ui]):disabled { cursor: not-allowed !important; }
+:is(button, [data-ui]):disabled:not([aria-busy="true"]) { opacity: .5; }
+:is(button, [data-ui]):disabled:hover { transform: none !important; }
+[data-ui="primary"], [data-ui="secondary"], [data-ui="quiet"], [data-ui="danger"], [data-ui="icon"], [data-ui="pill"] {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center;
+  gap: var(--ui-button-gap) !important;
+  min-height: var(--ui-button-height) !important;
+  min-width: 44px !important;
+  border-radius: var(--ui-button-radius) !important;
+  border: 1px solid transparent;
+  padding: 10px 16px !important;
+  text-decoration: none !important;
+  font-weight: 600;
+  line-height: 1.35;
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+[data-ui="primary"] { color: #fff !important; background: var(--ui-primary) !important; border-color: var(--ui-primary) !important; }
+[data-ui="primary"]:not(:disabled):hover { background: var(--ui-primary-hover) !important; border-color: var(--ui-primary-hover) !important; }
+[data-ui="primary"]:not(:disabled):active { background: var(--ui-primary-pressed) !important; border-color: var(--ui-primary-pressed) !important; }
+[data-ui="secondary"], [data-ui="icon"], [data-ui="pill"] { background: #fff !important; color: #123669 !important; border: 1px solid #b7cce7 !important; }
+[data-ui="quiet"] { background: transparent !important; color: #123669 !important; border-color: transparent !important; }
+:is([data-ui="secondary"], [data-ui="quiet"], [data-ui="icon"], [data-ui="pill"]):not(:disabled):hover { background: #eef5ff !important; border-color: #7c9fcc !important; }
+:is([data-ui="secondary"], [data-ui="quiet"], [data-ui="icon"], [data-ui="pill"]):not(:disabled):active { background: #dceaff !important; }
+[data-ui="danger"] { color: #a12626 !important; background: #fff !important; border-color: #d9a6a6 !important; }
+[data-ui="danger"]:not(:disabled):hover { background: #fff1f1 !important; }
+[data-ui="danger"]:not(:disabled):active { background: #ffe0e0 !important; }
+[data-ui="icon"] { width: 44px !important; height: 44px !important; flex-shrink: 0; padding: 10px !important; }
+[data-ui="pill"] { border-radius: 999px !important; }
+[data-ui="pill"][aria-pressed="true"], [data-ui="icon"][aria-pressed="true"] { background: #e6efff !important; color: #073a94 !important; border-color: #0759e6 !important; box-shadow: inset 0 0 0 1px #0759e6; font-weight: 700; }
+[data-ui="pill"][aria-pressed="true"]::before { content: '✓'; font-size: 14px; }
+[data-ui] > svg, button > svg { width: 20px; height: 20px; flex-shrink: 0; }
+[data-ui="card"] { border: 1px solid var(--ui-card-border) !important; border-radius: var(--ui-card-radius) !important; padding: var(--ui-card-padding) !important; box-shadow: var(--ui-card-shadow); }
+[data-ui="card-shell"] { border: 1px solid var(--ui-card-border) !important; border-radius: var(--ui-card-radius) !important; }
+[data-ui="card-body"] { padding: var(--ui-card-padding) !important; }
+[data-ui="card"] > :is(h2,h3):first-child { margin-top: 0; }
+button:not([data-ui]):not(:disabled):hover { filter: brightness(.98); }
+button:not(:disabled):active { filter: brightness(.96); }
+button[aria-busy="true"] { cursor: progress !important; opacity: 1 !important; }
+.portal-spinner { width: 18px; height: 18px; flex-shrink: 0; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: portal-spin 750ms linear infinite; }
+@keyframes portal-spin { to { transform: rotate(360deg); } }
+@media (max-width: 600px) { :root { --ui-card-padding: 18px; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; } }
+html[data-reduce-motion="true"] *, html[data-reduce-motion="true"] *::before, html[data-reduce-motion="true"] *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }

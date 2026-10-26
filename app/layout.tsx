@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { EB_Garamond, Inter, Manrope, Outfit, Space_Grotesk, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
+import "./controls.css";
 import { TrackerProvider } from "@/components/TrackerProvider";
 import { initialTrackerState } from "@/lib/mock-data";
 import { loadTrackerState, emptyTrackerState } from "@/lib/data/supabase-state";
