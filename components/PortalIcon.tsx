@@ -1,5 +1,11 @@
 import type { ReactNode } from 'react';
 const paths:Record<string,ReactNode>={
+ 'arrow-right':<path d="M4 12h16m-6-6 6 6-6 6"/>,
+ 'arrow-left':<path d="M20 12H4m6-6-6 6 6 6"/>,
+ 'chevron-right':<path d="m9 5 7 7-7 7"/>,
+ 'chevron-down':<path d="m5 9 7 7 7-7"/>,
+ external:<><path d="M14 3h7v7m0-7L10 14"/><path d="M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5"/></>,
+ close:<path d="m6 6 12 12M6 18 18 6"/>,
  settings:<><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></>,
  support:<><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 0 1 6 0c0 2-3 2-3 4m0 3h.01"/></>,
  clock:<><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></>,
@@ -18,4 +24,4 @@ const paths:Record<string,ReactNode>={
  resources:<path d="M3 5h6l2 3h10v12H3V5Z"/>,
  profile:<><circle cx="12" cy="7" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2H4Z"/></>
 };
-export function PortalIcon({name}:{name:string}){return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">{paths[name]||paths.profile}</svg>}
+export function PortalIcon({name,size=20}:{name:string;size?:18|20|24}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">{paths[name]||paths.profile}</svg>}

@@ -8,3 +8,8 @@
 .navigation button:hover { background:#dceaff; }.navigation button:focus-visible { outline:2px solid #0759e6; outline-offset:2px; }
 .dots button { width:32px; }.dots span { width:7px; height:7px; border-radius:50%; background:#899ebd; }.dots button[aria-pressed=true] span { width:19px; border-radius:8px; background:#0759e6; }
 @media(max-width:640px) { .controls { padding:8px 10px; flex-wrap:wrap; }.banner { border-radius:12px; margin-bottom:20px; }.controls p { font-size:11px; } }
+
+/* Small visible dots retain full-size touch targets. */
+.navigation button,.dots button { width:44px; height:44px; min-width:44px; min-height:44px; }
+.navigation { flex-wrap:wrap; }
+@media(max-width:380px){.navigation,.dots{gap:0;}.controls{padding-inline:6px;}}

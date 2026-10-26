@@ -31,7 +31,7 @@ export function SubjectLearning({paper,topics,progress,level,backHref,onUpdate,p
    {tab==='path'&&<div className={styles.image} aria-hidden="true"><PortalArtwork kind={subjectIcon(paper.name)}/></div>}
    <div className={styles.heroContent}><span className={styles.eyebrow}>{paper.code}</span><h1>{paper.name}</h1>
    <div className={styles.metrics}><div><small>Topics available</small><strong>{ordered.length}</strong></div><div><small>Current phase</small><strong>{records.some(r=>r.lastStudied||r.status!=='Not Started')?'Learning':'Not Started'}</strong></div><div><small>Current topic</small><strong>{current?.topicName||'Awaiting publication'}</strong></div><div><small>Next study session</small><Link href={weeklyHref}>View Weekly Plan →</Link></div></div>
-   <div className={styles.resume}><div><small>{recent?'CONTINUE LEARNING':'START LEARNING'}</small><h2>{current?.topicName||'Your topics will appear here'}</h2><p>{next?`Next topic: ${next.topicName}`:current?'Last topic in the current list.':'The topic list for this subject has not been published yet.'}</p></div>{current&&<Link className={styles.primary} href={lessonHref(current.id)}>{recent?'Continue':'Open topic'} →</Link>}</div>
+   <div className={styles.resume}><div><small>{recent?'CONTINUE LEARNING':'START LEARNING'}</small><h2>{current?.topicName||'Your topics will appear here'}</h2><p>{next?`Next topic: ${next.topicName}`:current?'Last topic in the current list.':'The topic list for this subject has not been published yet.'}</p></div>{current&&<Link data-ui="primary" className={styles.primary} href={lessonHref(current.id)}>{recent?'Continue':'Open topic'} →</Link>}</div>
    </div>
   </header>
 
