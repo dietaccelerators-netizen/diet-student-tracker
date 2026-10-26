@@ -1,4 +1,5 @@
 "use client";
+import { PortalButton } from './PortalControls';
 import { PortalIcon } from './PortalIcon';
 
 import { useEffect, useMemo, useState } from "react";
@@ -57,7 +58,7 @@ export function ManagePapers({ studentId, adminMode = false }: { studentId: stri
 
   return (
     <div>
-      <button
+      <button data-ui="secondary"
         type="button"
         onClick={() => { setSelected(studentPaperIds); setOpen((value) => !value); setSaved(false); setError(null); }}
         className="mv-button mv-button-outline"
@@ -111,11 +112,9 @@ export function ManagePapers({ studentId, adminMode = false }: { studentId: stri
           {error && <p className="mt-4 text-sm font-medium text-[#8C4E3E]" role="alert">{error}</p>}
 
           <div className="mt-5 flex flex-wrap gap-3">
-            <button type="button" onClick={() => void save()} disabled={selected.length === 0 || syncing} className="mv-button">
-              {syncing ? "Saving…" : "Save papers"}
-            </button>
+            <PortalButton variant="primary" onClick={() => void save()} disabled={selected.length === 0} loading={syncing} loadingLabel="Saving papers…">Save papers</PortalButton>
             {studentPaperIds.length > 0 && (
-              <button type="button" onClick={cancel} disabled={syncing} className="mv-button mv-button-outline">Cancel</button>
+              <button data-ui="secondary" type="button" onClick={cancel} disabled={syncing} className="mv-button mv-button-outline">Cancel</button>
             )}
           </div>
         </section>

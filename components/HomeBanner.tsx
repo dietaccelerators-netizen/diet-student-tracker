@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import Image from 'next/image';
+import { IconButton } from './PortalControls';
 import styles from './HomeBanner.module.css';
 
 export function HomeBanner() {
@@ -34,11 +35,11 @@ export function HomeBanner() {
     <div className={styles.controls}>
       <p aria-live="polite" aria-atomic="true">Banner {active + 1} of {count} <span>· Sample artwork</span></p>
       <div className={styles.navigation}>
-        <button type="button" aria-label="Previous banner" onClick={() => move(-1)}>←</button>
+        <IconButton label="Previous banner" icon="arrow-left" onClick={() => move(-1)}/>
         <div className={styles.dots} role="group" aria-label="Choose banner">
           {Array.from({ length: count }, (_, index) => <button key={index} type="button" aria-label={`Show banner ${index + 1}`} aria-pressed={active === index} onClick={() => setActive(index)}><span /></button>)}
         </div>
-        <button type="button" aria-label="Next banner" onClick={() => move(1)}>→</button>
+        <IconButton label="Next banner" icon="arrow-right" onClick={() => move(1)}/>
       </div>
     </div>
   </section>;
