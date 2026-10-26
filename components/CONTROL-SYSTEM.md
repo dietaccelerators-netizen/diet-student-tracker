@@ -12,3 +12,15 @@ The shared rules are in `app/controls.css`; typography stays in each page's modu
 - Frequent controls target at least 44 × 44 CSS pixels. Small carousel dots sit inside full-size buttons. Nav icons remain 20 px.
 - Normal, hover, pressed, focus, disabled and pending states share tokens. Honour both OS and portal reduced-motion preferences. Reading content has no added animation.
 - Status text remains required; colour alone is insufficient. This system is not a WCAG conformance claim. Test keyboard flow, focus clipping, reflow and contrast on rendered pages before claiming conformance.
+
+## Purposeful motion
+
+- Use 140ms colour/border transitions for controls; active tab indicators change over the same duration.
+- Mark whole-card actions with `data-motion="card"`. Fine pointers get at most a 2px lift; non-actionable containers do not gain a new lift.
+- Native help/history disclosures use `data-motion="disclosure"` with a 200ms height transition where supported. Older browsers retain instant native opening and closing. Hidden contents stay non-interactive.
+- Bookmarks retain their persistent selected state and the existing saved/removed confirmation. No animation loop is added.
+- Session completion feedback is triggered only after the save resolves. Existing totals and the plan update from the saved result; revisiting history does not replay the checkmark animation.
+- `PortalLoading` gives draft/resource/session lists a static, labelled placeholder. No shimmer or false progress is shown.
+- Existing inline save errors and retry controls are retained. Failed saves do not show completion feedback.
+- Both device and portal Reduce Motion disable transitions and hover displacement. Reading content remains still independently of these settings.
+- Timings are design defaults, not a conformance claim; test real devices and long study sessions before tuning further.

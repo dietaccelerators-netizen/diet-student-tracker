@@ -56,7 +56,7 @@ export function PracticeRoom({studentId='preview',papers=emptyPapers,topics=empt
  const sections=selectedTopic?.sections||[];
  const filtered=sample?samples.filter(q=>(!sampleSubject||q.subjectSlug===sampleSubject)&&(!topic||q.topicSlug===topic)&&(!section||q.sectionSlug===section)&&(!search||`${q.question} ${q.topicName} ${q.questionType}`.toLowerCase().includes(search.toLowerCase()))):[];
  const shown=filtered.filter(q=>tab==='quick-review'?q.mode==='quick-review'||q.mode==='lecture-check':tab==='exam-focus'?q.mode==='exam-focus':false);
- const nav=(<nav className={styles.tabs} aria-label="Practice sections">{tabs.filter(([id])=>sample?['home','quick-review','exam-focus','history'].includes(id):['home','history','simulations'].includes(id)).map(([id,title])=><button key={id} aria-current={tab===id?'page':undefined} onClick={()=>{setTab(id);setSearch('');}}>{id==='home'?(sample?'Demo formats':'Practice formats'):title}</button>)}</nav>);
+ const nav=(<nav data-motion="tabs" className={styles.tabs} aria-label="Practice sections">{tabs.filter(([id])=>sample?['home','quick-review','exam-focus','history'].includes(id):['home','history','simulations'].includes(id)).map(([id,title])=><button key={id} aria-current={tab===id?'page':undefined} onClick={()=>{setTab(id);setSearch('');}}>{id==='home'?(sample?'Demo formats':'Practice formats'):title}</button>)}</nav>);
  const reportHref=params.get('mode')==='preview'?`/login?mode=preview&stage=${encodeURIComponent(params.get('stage')||'Professional')}&view=report`:'/dashboard?view=report';
  function switchSample(value:boolean){setSample(value);setTopic('');setSection('');setSearch('');}
  function enterDemo(){switchSample(true);setSampleSubject('');setTab('home');}
