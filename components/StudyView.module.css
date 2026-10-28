@@ -37,3 +37,14 @@
 @media(prefers-reduced-motion:reduce){.view *{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 .view[data-reading-only] :is(button,a):hover{transform:none!important}
 .view[data-reading-only] :is(button,a){transition:none!important}
+
+/* Controls remain reachable on small/landscape displays and at enlarged text. */
+.view[data-study-full]{overscroll-behavior:contain;scroll-padding-block:72px 24px}
+.view.view.view .reveal{min-height:44px;min-width:44px;top:max(12px,env(safe-area-inset-top));right:max(16px,env(safe-area-inset-right))}
+.view[data-study-full][data-reading-only] .toolbar{top:calc(64px + env(safe-area-inset-top));right:max(16px,env(safe-area-inset-right));max-height:calc(100dvh - 88px - env(safe-area-inset-top));overflow-y:auto;overscroll-behavior:contain}
+.toolbar label{flex-wrap:wrap;min-width:0;max-width:100%}
+.view.view.view .toolbar :is(select,button){max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.view.view.view :is(.reveal,.toolbar select,.toolbar button):focus-visible{outline:3px solid #0759e6;outline-offset:3px}
+.view.view.view [data-reading-content]{min-width:0;overflow-wrap:anywhere}
+.view.view.view [data-reading-content] :is(img,svg){max-width:100%;height:auto}
+@media(max-width:400px){.view[data-study-full][data-reading-only]{padding-inline:16px}.view[data-study-full][data-reading-only] .toolbar{left:12px;right:12px;max-width:none}.toolbar label{width:100%}}

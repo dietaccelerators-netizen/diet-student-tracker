@@ -73,3 +73,8 @@
 .equation figcaption{font-weight:650;color:#08245c}
 .tableScroll:focus-visible,.solution summary:focus-visible{outline:3px solid #76aaff;outline-offset:3px}
 @media(max-width:600px){.endActions{align-items:stretch;flex-direction:column}.endActions>*{width:100%}.keyTakeaways{padding-left:14px}.page.page .reading .example{padding:18px}}
+
+.accounting,.tableScroll,.equation{min-width:0;max-width:100%}
+.tableScroll{overscroll-behavior-inline:contain;scroll-padding:12px}
+.tableScroll:focus-visible{outline-color:#0759e6}
+.equation{overflow-wrap:anywhere}
