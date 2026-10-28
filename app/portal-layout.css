@@ -1,0 +1,66 @@
+/* Shared shell geometry. Keep this after legacy page styles. Reading remains isolated. */
+:root {
+  --portal-content-width: 1280px;
+  --portal-sidebar-width: 224px;
+  --portal-page-gutter: clamp(20px, 2.4vw, 36px);
+  --portal-section-gap: 24px;
+  --portal-heading-size: 32px;
+  --portal-heading-leading: 40px;
+}
+main:has(> .app-sidebar) {
+  display: grid;
+  grid-template-columns: var(--portal-sidebar-width) minmax(0, 1fr);
+  align-items: start;
+}
+main:has(> .app-sidebar) > .app-sidebar {
+  position: sticky; top: 82px; bottom: auto; width: auto;
+  height: auto; min-height: calc(100dvh - 82px); overflow: visible;
+  padding: 24px 14px; grid-column: 1; grid-row: 2;
+}
+main:has(> .app-sidebar) > .app-sidebar .nav-item {
+  min-height: 48px; margin: 0 0 4px; padding: 10px 14px; gap: 12px;
+  font-family: var(--font-source-sans), Arial, sans-serif;
+  font-size: 16px; line-height: 24px; white-space: normal;
+}
+main:has(> .app-sidebar) > .app-sidebar .nav-item svg { width: 20px; height: 20px; flex-shrink: 0; }
+main:has(> .app-sidebar) > .mx-auto {
+  grid-column: 2; grid-row: 2; width: 100%; min-width: 0;
+  max-width: var(--portal-content-width); margin: 0 auto;
+  padding: 28px var(--portal-page-gutter) 48px;
+}
+#portal-content .portal-section { width: 100%; min-width: 0; }
+#portal-content [data-portal-page][data-portal-page][data-portal-page] {
+  max-width: none; margin: 0; padding: 0; min-width: 0;
+}
+#portal-content [data-portal-page] > header h1 {
+  font-size: var(--portal-heading-size); line-height: var(--portal-heading-leading);
+}
+#portal-content [data-portal-page] > header { margin-bottom: var(--portal-section-gap); }
+#portal-content :is(h1,h2,h3) { overflow-wrap: anywhere; }
+.portal-menu-toggle { display: none; }
+.portal-skip {
+  position: fixed; top: 8px; left: 16px; z-index: 2000; transform: translateY(-160%);
+  padding: 12px 20px; color: #fff; background: #08245c; border-radius: 8px;
+}
+.portal-skip:focus { transform: none; outline: 3px solid #75a9ff; }
+#portal-content { scroll-margin-top: 100px; }
+/* On short or zoomed desktops, the sidebar follows document scrolling rather than
+   trapping navigation in a second scroll area. */
+@media (min-width: 761px) and (max-height: 680px) {
+  main:has(> .app-sidebar) > .app-sidebar { position: relative; top: 0; }
+}
+@media (max-width: 760px) {
+  :root { --portal-page-gutter: 16px; --portal-section-gap: 20px; --portal-heading-size: 26px; --portal-heading-leading: 34px; }
+  main:has(> .app-sidebar) { display: block; }
+  main:has(> .app-sidebar) > .app-sidebar { position: relative; top: 0; min-height: 0; padding: 8px 16px; width: 100%; }
+  .portal-menu-toggle { display: flex; width: 100%; min-height: 44px; align-items: center; justify-content: space-between; padding: 8px 12px; color: #fff; background: transparent; border: 1px solid #526b94; border-radius: 8px; font-size: 16px; }
+  main:has(> .app-sidebar) > .app-sidebar nav { display: none; overflow: visible; }
+  main:has(> .app-sidebar) > .app-sidebar[data-open=true] nav { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 4px; padding-top: 12px; }
+  main:has(> .app-sidebar) > .app-sidebar .nav-item { margin: 0; }
+  main:has(> .app-sidebar) > .mx-auto { margin: 0; padding: 20px var(--portal-page-gutter) 40px; }
+}
+@media (max-width: 380px) {
+  main:has(> .app-sidebar) > .app-sidebar[data-open=true] nav { grid-template-columns: 1fr; }
+}
+
+main:has(> .app-sidebar) > .app-topbar { grid-column: 1 / -1; grid-row: 1; }

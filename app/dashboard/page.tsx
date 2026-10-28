@@ -8,7 +8,7 @@ export default async function DashboardPage({searchParams}: {searchParams: Promi
   return (
     <main className="min-h-screen">
       <BrandHeader mode="student" activeView={view} />
-      <div className="mx-auto max-w-4xl px-5 sm:px-8">
+      <div id="portal-content" tabIndex={-1} className="mx-auto max-w-4xl px-5 sm:px-8">
         <StudentWorkspace studentId={student.id} view={view} />
       </div>
     </main>

@@ -7,7 +7,7 @@ export default async function AdminPage() {
   return (
     <main className="min-h-screen">
       <BrandHeader mode="admin" />
-      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+      <div id="portal-content" tabIndex={-1} className="mx-auto max-w-6xl px-5 sm:px-8">
         <AdminStudentsClient />
       </div>
     </main>

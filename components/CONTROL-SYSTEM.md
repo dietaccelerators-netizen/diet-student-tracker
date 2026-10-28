@@ -24,3 +24,13 @@ The shared rules are in `app/controls.css`; typography stays in each page's modu
 - Existing inline save errors and retry controls are retained. Failed saves do not show completion feedback.
 - Both device and portal Reduce Motion disable transitions and hover displacement. Reading content remains still independently of these settings.
 - Timings are design defaults, not a conformance claim; test real devices and long study sessions before tuning further.
+
+## Shared layout
+
+- `app/portal-layout.css` owns shell widths, gutters and navigation geometry. Preserve the existing Space Grotesk / Source Sans content typography.
+- Use `data-portal-page` for the Home, Subjects and Practice landing surfaces; the shell supplies outer padding, so these pages must not add another gutter. Reading workspaces retain their own layout.
+- Desktop navigation participates in the document layout. It sticks only when the viewport is tall enough to show all links; it never creates a second vertical scroll area.
+- At 760px and below, use the labelled navigation disclosure. Escape closes it and returns focus to its toggle. Selecting a destination closes it.
+- Every shell has a keyboard-visible Skip to content link and a focusable content destination.
+- Do not restore promotional panels to the sidebar. Keep announcements on Home below learning actions.
+- Preserve explicit unavailable/demo labels. A visual pass does not make question publication, cross-device sample history or ticket delivery operational.
