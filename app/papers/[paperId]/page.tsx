@@ -8,7 +8,7 @@ export default async function PaperPage({ params }: { params: Promise<{ paperId:
   return (
     <main className="min-h-screen">
       <BrandHeader mode="student" />
-      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+      <div id="portal-content" tabIndex={-1} className="mx-auto max-w-6xl px-5 sm:px-8">
         <PaperDetailClient studentId={student.id} paperId={paperId} />
       </div>
     </main>
