@@ -64,3 +64,15 @@ main:has(> .app-sidebar) > .mx-auto {
 }
 
 main:has(> .app-sidebar) > .app-topbar { grid-column: 1 / -1; grid-row: 1; }
+
+/* Mobile reflow and keyboard visibility. */
+.portal-menu-toggle svg{width:20px;height:20px;flex-shrink:0}
+.portal-menu-toggle:focus-visible{outline:3px solid #fff;outline-offset:3px}
+#portal-content :is(a,button,input,select,textarea,summary,[tabindex="0"]){scroll-margin-block:100px 24px}
+@media(max-width:760px){
+ main:has(> .app-sidebar) > .app-topbar{height:auto;min-height:72px;gap:12px;padding:12px 16px;flex-wrap:wrap}
+ main:has(> .app-sidebar) > .app-sidebar .nav-item{overflow-wrap:anywhere;min-width:0}
+ #portal-content .home-preview-note{flex-wrap:wrap;gap:12px;min-width:0}
+ #portal-content .home-preview-note label{flex-wrap:wrap;min-width:0}
+ #portal-content :is(input,select,textarea){max-width:100%;font-size: max(1rem,16px)}
+}
