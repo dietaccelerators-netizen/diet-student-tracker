@@ -4,6 +4,7 @@ import { usePortalPreferences } from './PortalPreferences';
 import { StudyView } from "./StudyView";
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
+import { journeyPortal } from '@/lib/learning-journey';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { sampleLearningTopic, type AccountingBlock, type StudySection } from '@/lib/subjectLessonSample';
 import styles from './TopicLessonLayout.module.css';
@@ -31,6 +32,7 @@ export function TopicLessonLayout({subject,topic,backHref,subjectId,topicId,chil
  const title=isSample?sampleLearningTopic.name:topic;
  const practiceParams=new URLSearchParams({view:'practice',fromLesson:'1',subject:subjectId,topic:topicId||'layout-sample',section:current?.slug||'',content:String(panel)});
  if(pathname==='/login'){practiceParams.set('mode','preview');practiceParams.set('stage',params.get('stage')||'Professional');}
+ if(params.get('fromSession')==='1')practiceParams.set('fromSession','1');
  const practiceHref=(pathname==='/login'?'/login':'/dashboard')+'?'+practiceParams.toString();
  const hasSimplified=!!current?.simplifiedContent?.paragraphs.length;
  const effectiveMode=hasSimplified?readingMode:'standard';
@@ -63,6 +65,7 @@ export function TopicLessonLayout({subject,topic,backHref,subjectId,topicId,chil
         {section<sections.length-1?<button className={done?'mv-button':'mv-button mv-button-outline'} onClick={()=>chooseSection(section+1)}>Next section →</button>:<Link className="mv-button mv-button-outline" href={backHref}>Return to Study Path</Link>}
         {!isSample&&<Link className={styles.practiceText} href={practiceHref}>Practise this topic →</Link>}
        </div>
+       {params.get('fromSession')==='1'&&<Link className={styles.practiceText} href={journeyPortal('weekly',pathname==='/login'?(params.get('stage')||'Professional'):undefined)+'#weekly-session-workspace'}>Return to session timer and save result →</Link>}
        {isSample&&<p className={styles.localNote}>Sample practice questions are not available. {saveError?'Completion is available for this visit only.':'Sample completion is saved in this browser.'}</p>}
       </footer>
      </>}

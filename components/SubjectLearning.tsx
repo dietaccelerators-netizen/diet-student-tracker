@@ -1,6 +1,7 @@
 "use client";
 import { PortalArtwork, subjectIcon } from './PortalArtwork';
 import Link from 'next/link';
+import { journeyPortal } from '@/lib/learning-journey';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { TopicLessonLayout } from './TopicLessonLayout';
 import { SubjectSyllabus } from './SubjectSyllabus';
@@ -15,9 +16,10 @@ export function SubjectLearning({paper,topics,progress,level,backHref,onUpdate,p
  const tab=params.get('subjectView')==='syllabus'?'syllabus':'path';
  const tabHref=(view:string)=>{const q=new URLSearchParams(subjectParams);q.set('subjectView',view);return pathname+'?'+q.toString();};
  const lessonHref=(id:string)=>{const q=new URLSearchParams(subjectParams);q.set('lesson',id);return pathname+'?'+q.toString();};
+ const sessionReturn=params.get('fromSession')==='1'?<p className={styles.back}><Link href={journeyPortal('weekly',preview?level:undefined)+'#weekly-session-workspace'}>← Return to session timer and save result</Link></p>:null;
  const selected=topics.find(t=>t.id===params.get('lesson'));
- if(params.get('lessonLayout')==='sample')return <TopicLessonLayout subjectId={paper.id} subject={paper.name} topic="Sample topic layout" backHref={subjectHref}/>;
- if(selected)return <LessonWorkspace key={selected.id} paper={paper} topics={topics} topic={selected} progress={progress} level={level} preview={preview} subjectHref={subjectHref} lessonHref={lessonHref} onUpdate={onUpdate}/>;
+ if(params.get('lessonLayout')==='sample')return <>{sessionReturn}<TopicLessonLayout subjectId={paper.id} subject={paper.name} topic="Sample topic layout" backHref={subjectHref}/></>;
+ if(selected)return <>{sessionReturn}<LessonWorkspace key={selected.id} paper={paper} topics={topics} topic={selected} progress={progress} level={level} preview={preview} subjectHref={subjectHref} lessonHref={lessonHref} onUpdate={onUpdate}/></>;
  if(params.has('lesson'))return <section className="subject-empty"><h1>Topic not found in this subject</h1><Link href={subjectHref}>Back to subject</Link></section>;
  const ordered=[...topics].sort((a,b)=>a.displayOrder-b.displayOrder);
  const records=progress.filter(p=>ordered.some(t=>t.id===p.topicId));
@@ -26,6 +28,7 @@ export function SubjectLearning({paper,topics,progress,level,backHref,onUpdate,p
  const next=current?ordered[ordered.indexOf(current)+1]:undefined;
  const weeklyHref=preview?`/login?mode=preview&stage=${encodeURIComponent(level)}&view=weekly`:'/dashboard?view=weekly';
  return <section className={styles.page} aria-label="Subject workspace">
+  {sessionReturn}
   <Link className={styles.back} href={backHref}>← My subjects</Link>
   <header className={styles.hero}>
    {tab==='path'&&<div className={styles.image} aria-hidden="true"><PortalArtwork kind={subjectIcon(paper.name)}/></div>}

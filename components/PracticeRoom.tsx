@@ -7,6 +7,7 @@ import type { Paper, Topic } from '@/lib/types';
 import { PortalIcon } from './PortalIcon';
 import { subjectIcon } from './PortalArtwork';
 import { StudyView } from './StudyView';
+import { LessonPracticePanel } from './LessonPracticePanel';
 import { AccountingPractice } from './AccountingPractice';
 import { practiceSubjects, practiceQuestions, type PracticeQuestion } from './PracticeSamples';
 import styles from './PracticeRoom.module.css';
@@ -67,6 +68,7 @@ export function PracticeRoom({studentId='preview',papers=emptyPapers,topics=empt
  if(objective)return <div className={styles.page}><AccountingPractice studentId={studentId} onClose={()=>{setObjective(false);refreshObjective();setSample(true);setTab('home');}}/></div>;
  return <section className={styles.page} data-portal-page aria-label="Practice Room">
   <header className={styles.heading}><div><h1>Practice Room</h1><p>Put your learning into practice, one focused attempt at a time.</p></div><span className={styles.headerIcon}><PortalIcon name="practice"/></span></header>
+  {!sample&&params.get('fromLesson')==='1'&&<LessonPracticePanel papers={papers} topics={topics} previewStage={params.get('mode')==='preview'?(params.get('stage')||'Professional'):undefined}/>}
   {!loaded&&<p role="status">Checking for unfinished practice…</p>}
   {loaded&&(draft||objectivePending)&&<section className={styles.resumeFirst} aria-label="Unfinished practice"><div><span className={styles.eyebrow}>PICK UP WHERE YOU STOPPED · GUIDED DEMO</span><h2>{draft?samples.find(q=>q.id===draft.questionId)?.topicName:'Accounting fundamentals'}</h2><p>{draft?(draft.completed?'Your answer is ready to review and self-assess.':`${clock(draft.elapsed)} practised · Your draft is saved in this browser.`):'Your saved multiple-choice answers are ready to continue.'}</p></div><button data-ui="primary" className={styles.primary} onClick={()=>draft?setQuestion(samples.find(q=>q.id===draft.questionId)!):setObjective(true)}>{draft?.completed?'Continue answer review':'Resume attempt'} →</button>{draft&&objectivePending&&<button data-ui="secondary" className={styles.secondary} onClick={()=>setObjective(true)}>Resume objective demo</button>}</section>}
   {sample&&<div className={styles.demoBanner}><div><strong>Guided demo</strong><p>Original sample questions · Browser-only progress · Excluded from your Learning Report. Tax examples are illustrative, not verified current exam guidance.</p></div><button data-ui="secondary" className={styles.secondary} onClick={()=>{switchSample(false);setTab('home');}}>Exit demo</button></div>}
